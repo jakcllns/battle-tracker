@@ -41,6 +41,14 @@ const parse = notation => {
     }
 }
 
+export const isDiceNotation = (notation) => {
+    try {
+        parse(notation);
+        return true
+    } catch {
+        return false
+    }
+}
 
 class Dice {
     constructor(notation) {
