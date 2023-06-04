@@ -1,6 +1,6 @@
 'use client'
-import { isDiceNotation } from "@/utils/DiceParser/DiceParser"
-import { useState, useEffect } from "react"
+// import { isDiceNotation } from "@/utils/DiceParser/DiceParser"
+import { useState } from "react"
 import Search from "../search/search"
 
 const GetNewCreature = () => {

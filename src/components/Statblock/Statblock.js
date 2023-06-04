@@ -12,7 +12,6 @@ const Statblock = (props) => {
                 return res.json()
             })
             .then(data => {
-                console.log(data)
                 const hitPoints = new Dice(data.HitDie).roll().result
                 const fetchedMonster =  {
                     name: data.Name,
