@@ -51,6 +51,8 @@ export const isDiceNotation = (notation) => {
 }
 
 class Dice {
+    notation
+    dice
     constructor(notation) {
         if (typeof notation !== 'string') {
             throw new Error('Notations must be in valid dice notation as a string')
@@ -76,6 +78,15 @@ class Dice {
             result: rolls.reduce((a, b) => a + b) + this.dice.modifier
         }
     }
+}
+
+export function rollDice(notation) {
+    if(!isDiceNotation(notation)) {
+        throw new Error('Argument provided must be in proper dice notation.')
+    }
+    const dice = new Dice(notation)
+
+    return dice.roll()
 }
 
 export default Dice

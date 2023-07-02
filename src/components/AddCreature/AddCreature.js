@@ -49,7 +49,7 @@ const AddCreature = props => {
         const val = event.target.value
 
         if(Number(val) && Number.isInteger(Number(val))) {
-            setSearchedCreature({...searchedCreature, HitPoints: Number(val), HitDie: ''})
+            setSearchedCreature({...searchedCreature, HitPoints: Number(val), HitDie: undefined})
             return
         }
 
@@ -71,7 +71,7 @@ const AddCreature = props => {
             <div className="flex flex-row mex-auto gap-x-5">
                 <Search
                     label="Creature Name"
-                    searchValue={searchValue}
+                    searchedCreature={searchedCreature}
                     setSearchValue={setSearchValue}
                     setSearchedCreature={handleSetSearchedCreature}
                     data={props.data}
@@ -121,8 +121,8 @@ const AddCreature = props => {
                         <button 
                             className="mx-3 px-2 text-lg font-bold  rounded border-2 border-white hover:bg-slate-600" 
                             onClick={() =>{
-                                props.handleCreatureSubmit(searchedCreature)
                                 setSearchedCreature(GetNewCreature())
+                                props.handleCreatureSubmit(searchedCreature)
                             }}
                         >+</button>
                     </div>

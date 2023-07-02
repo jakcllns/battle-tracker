@@ -1,85 +1,60 @@
 'use client'
 
-import { useEffect, useState } from "react"
-import Dice from "@/utils/DiceParser/DiceParser"
+// Fix damange and heal functions of the Statblock so that it works with changing the creature provided by the page element
 
 const Statblock = (props) => {
-    const [monster, setMonster] = useState(undefined)
-
-    useEffect(() => {
-        fetch(`api/monsters/${props.monsterid}`, {cache: 'no-store'})
-            .then(res => {
-                return res.json()
-            })
-            .then(data => {
-                const hitPoints = new Dice(data.HitDie).roll().result
-                const fetchedMonster =  {
-                    name: data.Name,
-                    maxHitPoints: hitPoints,
-                    currentHitPoints: hitPoints,
-                    armorClass: data.ArmorClass,
-                    initiative: Math.floor((data.DEX-10)/2) + new Dice('1d20').roll().result,
-                    damage: 0,
-                    heal: 0,
-                    condition: []
-                }
- 
-                setMonster(fetchedMonster)
-            })
-
-    },[])
 
     const handleDamageClick = () => {
-        const newMonster = {...monster}
+        const newMonster = {...props.creature}
 
         newMonster.currentHitPoints -= newMonster.damage
         newMonster.currentHitPoints = Math.max(newMonster.currentHitPoints, 0)
         newMonster.damage = 0
 
-        setMonster(newMonster)
+        props.onCreatureUpdate(props.index, newMonster)
     }
 
     const handleDamageInput = event => {
-        const newMonster = {...monster}
+        const newMonster = {...props.creature}
 
         newMonster.damage = Number(event.target.value)
 
-        setMonster(newMonster)
+        props.onCreatureUpdate(props.index, newMonster)
     }
 
     const handleHealClick = () => {
-        const newMonster = {...monster}
+        const newMonster = {...props.creature}
 
         newMonster.currentHitPoints = Math.min(newMonster.currentHitPoints + newMonster.heal, newMonster.maxHitPoints)
         newMonster.heal = 0
 
-        setMonster(newMonster)
+        props.onCreatureUpdate(props.index, newMonster)
 
     }
 
     const handleHealInput = event => {
-        const newMonster = {...monster}
+        const newMonster = {...props.creature}
 
         newMonster.heal = Number(event.target.value)
 
-        setMonster(newMonster)
+        props.onCreatureUpdate(props.index, newMonster)
     }
 
     return (
         <>
-            {monster ? (
-                <div>
-                    <h1 className="text-3xl">{monster.name}</h1>
-                    <p><strong>Max Hit Points:</strong> {monster.maxHitPoints}</p>
-                    <p><strong>Current Hit Points:</strong> {monster.currentHitPoints}</p>
-                    <p><strong>AC:</strong> {monster.armorClass}</p>
-                    <p><strong>Initiative:</strong> {monster.initiative}</p>
+            {props.creature ? (
+                <div key={props.index}>
+                    <h1 className="text-3xl">{`${props.creature.name}`}</h1>
+                    <p><strong>Max Hit Points:</strong> {props.creature.maxHitPoints}</p>
+                    <p><strong>Current Hit Points:</strong> {props.creature.currentHitPoints}</p>
+                    <p><strong>AC:</strong> {props.creature.armorClass}</p>
+                    <p><strong>Initiative:</strong> {props.creature.initiative}</p>
 
                     <button onClick={handleDamageClick}>Damage</button>
-                    <input className="px-0 mx-2 border-slate-900 border-solid border rounded" type="number" onChange={handleDamageInput} value={monster.damage || ''} />
+                    <input onKeyDown={event => event.key === 'Enter' && handleDamageClick()} className="px-0 mx-2 border-slate-900 border-solid border rounded" type="number" onChange={handleDamageInput} value={props.creature.damage || ''} />
                     <br/>
                     <button onClick={handleHealClick}>Heal</button>
-                    <input className="px-0 mx-2 border-slate-900 border-solid border rounded" type="number" value={monster.heal || ''} onChange={handleHealInput}/>
+                    <input onKeyDown={event => event.key === 'Enter' && handleHealClick()} className="px-0 mx-2 border-slate-900 border-solid border rounded" type="number" value={props.creature.heal || ''} onChange={handleHealInput}/>
                 </div>
             ) : undefined}
         </>
