@@ -89,4 +89,14 @@ export function rollDice(notation) {
     return dice.roll()
 }
 
+export function averageRoll(notation) {
+    if(!isDiceNotation(notation)) {
+        throw new Error('Argument provided must be in proper dice notation.')
+    }
+
+    let result = parse(notation)
+
+    return ((result.dieType + 1)/2)*result.numberOfDie + result.modifier
+}
+
 export default Dice

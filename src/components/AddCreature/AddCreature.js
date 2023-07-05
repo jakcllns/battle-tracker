@@ -12,7 +12,7 @@ const GetNewCreature = () => {
         id_name: '',
         multiply: 1,
         initiative: '1d20',
-        HitPoints: undefined
+        HitPoints: 0
     }
 }
 
@@ -23,7 +23,7 @@ const createInitiativeDiceNotation = dex => {
 
 const AddCreature = props => {
     const [searchValue, setSearchValue] = useState('')
-    const [searchedCreature, setSearchedCreature] = useState({...GetNewCreature()})
+    const [searchedCreature, setSearchedCreature] = useState(GetNewCreature())
 
     const handleSetSearchedCreature = creature => {
         if(!creature){
@@ -67,9 +67,10 @@ const AddCreature = props => {
         setSearchedCreature({...searchedCreature, multiply: multiply === 0 ? undefined : multiply})
     }
     return (
-        <div className="container w-auto mx-auto p-4 bg-slate-800 text-slate-50 rounded-2xl">
-            <div className="flex flex-row mex-auto gap-x-5">
+        <div className="container w-auto  p-4 bg-slate-800 text-slate-50 rounded-2xl">
+            <div className="flex flex-row gap-x-5 flex-wrap w-fit sm:mx-auto xl:mx-0">
                 <Search
+
                     label="Creature Name"
                     searchedCreature={searchedCreature}
                     setSearchValue={setSearchValue}
@@ -96,7 +97,7 @@ const AddCreature = props => {
                     <label>Initiative</label>
                     <input 
                         type="text" 
-                        className="rounded-sm text-slate-950" 
+                        className="rounded-sm text-slate-950 w-20" 
                         value={searchedCreature.initiative}
                         onChange={handleInitiativeChange}
                     />
@@ -105,21 +106,21 @@ const AddCreature = props => {
                     <label>Hit Points</label>
                     <input 
                         type="text" 
-                        className="rounded-sm text-slate-950" 
-                        value={searchedCreature.HitDie !== '' ? searchedCreature.HitDie : searchedCreature.HitPoints === 0 ? '' : searchedCreature.HitPoints} 
+                        className="rounded-sm text-slate-950 w-24" 
+                        value={searchedCreature.HitDie ? searchedCreature.HitDie : searchedCreature.HitPoints === 0 ? '' : searchedCreature.HitPoints} 
                         onChange={handleHitPointChange}
                     />
                 </div>
                 <div className="flex flex-col gap-y-2">
                     <label>Armor Class</label>
-                    <input type="number" className="rounded-sm text-slate-950" value={searchedCreature.ArmorClass} onChange={handleArmorClassChange} />
+                    <input type="number" min={1} className="rounded-sm text-slate-950 w-10 mx-auto" value={searchedCreature.ArmorClass} onChange={handleArmorClassChange} />
                 </div>
                 <div className="flex flex-col gap-y-2">
                     <label>Multiply</label>
-                    <div>
-                        <input type="number" className="rounded-sm text-slate-950" value={searchedCreature.multiply} onChange={handleMultiplyChange}/>
+                    <div className="">
+                        <input type="number" min={1} className="rounded-sm text-slate-950 w-10" value={searchedCreature.multiply} onChange={handleMultiplyChange}/>
                         <button 
-                            className="mx-3 px-2 text-lg font-bold  rounded border-2 border-white hover:bg-slate-600" 
+                            className="mx-3 px-2 text-lg font-bold  rounded border-2 border-white hover:bg-slate-600 w-10" 
                             onClick={() =>{
                                 setSearchedCreature(GetNewCreature())
                                 props.handleCreatureSubmit(searchedCreature)
@@ -128,23 +129,6 @@ const AddCreature = props => {
                     </div>
                 </div>
             </div>
-            {/* <form className="max-w-4xl mx-auto p-4 flex justify-between items-center">
-                <div className="">
-                    <div className="flex-row">
-                        <div className="flex-col">
-                            <label>Creature Name</label>
-                            <select>
-                                <option value='GreenHag'>Green Hag</option>
-                            </select>
-                        </div>
-                        <div className="flex-col">
-                            <label>Initiative</label>
-                            <input type='text' />
-                        </div>
-                    </div>
-                    
-                </div>
-            </form> */}
         </div>
     )
 }
