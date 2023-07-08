@@ -2,6 +2,7 @@
 import AddCreature from "@/components/AddCreature/AddCreature";
 import Statblock from "@/components/Statblock/Statblock";
 import Dice from "@/utils/DiceParser/DiceParser";
+import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 
 
@@ -86,6 +87,7 @@ export default function Page(props){
     return(
       <>
         <div className="container w-auto mx-auto p-4 bg-slate-800 text-slate-50 rounded-t-2xl">
+          <Link href={'/new-creature'}>Create New Creature</Link>
           <h1 className="text-xl xl:mx-3 md:mx-auto w-fit">Battle Tracker</h1>
           <AddCreature data={data} handleCreatureSubmit={handleCreatureSubmit}/>
         </div>

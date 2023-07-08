@@ -96,7 +96,7 @@ export function averageRoll(notation) {
 
     let result = parse(notation)
 
-    return ((result.dieType + 1)/2)*result.numberOfDie + result.modifier
+    return Math.round(((result.dieType + 1)/2)*result.numberOfDie + result.modifier)
 }
 
 export default Dice

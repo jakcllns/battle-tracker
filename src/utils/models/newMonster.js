@@ -1,13 +1,6 @@
 import { Schema, model, models } from "mongoose";
 
 export const NewMonsterSchema = new Schema({
-    id_name: {
-        type: String,
-        lowercase: true,
-        index: {
-            unique: true,
-        }
-    },
     name:{
         type: String
     },
@@ -32,9 +25,9 @@ export const NewMonsterSchema = new Schema({
     hitDie: {
         type: String
     },
-    movementSpeed: {
+    movementSpeed: [{
         type: String
-    },
+    }],
     str: {
         type: Number
     },
@@ -96,9 +89,9 @@ export const NewMonsterSchema = new Schema({
     senses: [{
         type: String
     }],
-    languages: {
+    languages: [{
         type: String
-    },
+    }],
     challenge: {
         type: String
     },
@@ -119,11 +112,15 @@ export const NewMonsterSchema = new Schema({
         {
             name: {type: String},
             attackType: {type: String},
-            damageTypes: [{type: String}],
             modifier: {type: Number},
             reach: {type: String},
             targets: {type: Number},
-            hits: [{type: String}],
+            hits: [
+                {
+                    dieType: {type: String},
+                    damageType: {type: String},
+                }
+            ],
             description: {type: String}
 
         }

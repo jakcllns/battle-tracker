@@ -2,12 +2,6 @@ import { ConnectToDb } from "@/utils/db";
 import NewMonsters from "@/utils/models/newMonster";
 import { NextRequest } from "next/server";
 
-export const config = {
-    api: {
-        bodyParser: true
-    }
-}
-
 export const dynamic = 'force-static'
 
 export async function GET(request){

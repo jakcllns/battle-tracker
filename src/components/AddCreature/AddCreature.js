@@ -117,7 +117,7 @@ const AddCreature = props => {
                 </div>
                 <div className="flex flex-col gap-y-2">
                     <label>Multiply</label>
-                    <div className="">
+                    <div className="-mt-1">
                         <input type="number" min={1} className="rounded-sm text-slate-950 w-10" value={searchedCreature.multiply} onChange={handleMultiplyChange}/>
                         <button 
                             className="mx-3 px-2 text-lg font-bold  rounded border-2 border-white hover:bg-slate-600 w-10" 
