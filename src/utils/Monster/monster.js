@@ -25,6 +25,7 @@ export const initializeMonster = () => {
             "legendaryResistances": [],
             "damageImmunities": [],
             "conditionImmunities": [],
+            "damageVulnerabilites": [],
             "senses": [],
             "languages": [],
             "challenge": "",
@@ -82,7 +83,7 @@ export const createLegendaryResistance = (resistanceName, description) => {
     }
 }
 
-export const createAbilities = (abilityName, description) => {
+export const createAbilities = (abilityName, description, isAction = false) => {
     if (typeof abilityName !== 'string' || typeof description !== 'string') {
         const error = new Error('Invalid input')
         throw error
@@ -90,7 +91,8 @@ export const createAbilities = (abilityName, description) => {
 
     return ({
         name: abilityName,
-        description: description
+        description: description,
+        isAction: isAction
     })
 }
 
