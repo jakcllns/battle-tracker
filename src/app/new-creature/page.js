@@ -3,14 +3,17 @@ import AddButton from "@/components/AddButton/AddButton";
 import DeleteButton from "@/components/DeleteButton/DeleteButton";
 import ListBox from "@/components/ListBox/ListBox";
 import ListInput from "@/components/ListInput/ListInput";
+import SubmitButton from "@/components/SubmitButton/SubmitButton";
+import TextArea from "@/components/TextArea/TextArea";
 import { ChallengeRatings } from "@/utils/challengeRatingLookup";
 import { isDiceNotation, averageRoll } from "@/utils/DiceParser/DiceParser";
-import { createAbilities, createAction, createLegendaryAction, createSavingThrow, createSkill, initializeMonster } from "@/utils/Monster/monster";
+import { createAbilities, createAction, createLegendaryAction, createSavingThrow, createSkill, initializeMonster, Tarrasque } from "@/utils/Monster/monster";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Page(props) {
-    const [monster, setMonster] = useState(initializeMonster);
+    // const [monster, setMonster] = useState(initializeMonster);
+    const [monster, setMonster] = useState(Tarrasque);
     const [validHitDie, setValidHitDie] = useState(false);
     const [validMovement, setValidMovement] = useState(true);
     const [movementSpeed, setMovementSpeed] = useState('');
@@ -30,26 +33,39 @@ export default function Page(props) {
         hasAbilities: false,
         hasRegionEffects: false,
         isLegendary: false,
-        isMythic: false
+        isMythic: false,
+        hasLair: false
     })
 
     const [savingThrow, setSavingThrow] = useState(createSavingThrow('', 0))
     const [skill, setSkill] = useState(createSkill('', 0))
     const [sense, setSense] = useState('')
     const [language, setLanguage] = useState('')
-    const [action, setAction] = useState(createAction('','Melee Weapon Attack',0,'',1, []))
+    const [action, setAction] = useState(createAction('','Melee Weapon Attack',0,'',1, [], ''))
     const [legendaryAction, setLegendaryAction] = useState(createLegendaryAction('',''))
     const [regionalEffect, setRegionalEffect] = useState({name: '', description: ''})
     const [ability, setAbility] = useState(createAbilities('',''))
     const [hit, setHit] = useState({dieType: '', damageType: ''})
     const [mythicAction, setMythicAction] = useState({name: '', description: ''})
+    const [lairAction, setLairAction] = useState({name: '', description: ''})
 
     useEffect(() => console.log(action), [action])
 
     useEffect(()=> {
-        console.log(monster)
-
         
+        const updatedOptions = {...options}
+        updatedOptions.hasAbilities = monster.abilities.length > 0
+        updatedOptions.hasConditionImmunities = monster.conditionImmunities.length > 0
+        updatedOptions.hasDamageImmunities = monster.damageImmunities.length > 0
+        updatedOptions.hasDamageVulnerabilities = monster.damageVulnerabilites.length > 0
+        updatedOptions.hasRegionEffects = monster.regionalDescription !== ''
+        updatedOptions.hasResistance = monster.damageResistances.length > 0
+        updatedOptions.isLegendary = monster.legendaryDescription !== ''
+        updatedOptions.isMythic = monster.mythicDescription !== ''
+        updatedOptions.hasLair = monster.lairDescription !== ''
+
+        setOptions(updatedOptions)
+
         if(validHitDie === isDiceNotation(monster.hitDie)){return}
         setValidHitDie(isDiceNotation(monster.hitDie))
 
@@ -218,6 +234,15 @@ export default function Page(props) {
         setOptions({...options, isLegendary: checked})
     }
 
+    const handleHasLair = event => {
+        const checked = event.target.checked
+        if(!checked) {
+            setMonster({...monster, lairDescription: '', lairActions: []})
+        }
+
+        setOptions({...options, hasLair: checked})
+    }
+
     const handleHasRegionalEffect = event => {
         const checked = event.target.checked
         if(!checked) {
@@ -250,6 +275,19 @@ export default function Page(props) {
         newMonster.mythicActions.push(mythicAction)
         setMythicAction({name: '', description: ''})
         setMonster(newMonster)
+    }
+
+    const handleAddLairAction = event => {
+        event.preventDefault()
+        const newMonster = {...monster}
+        newMonster.lairActions.push(lairAction)
+        setLairAction({name: '', description: ''})
+        setMonster(newMonster)
+    }
+
+    const handleCreateCreature = event => {
+        event.preventDefault()
+        console.log(JSON.stringify({...monster, id_name: monster.name.toLowerCase().replace(/\s/g, '_')}))
     }
 
     const renderResitanceControl = (hasResistance) => {
@@ -381,7 +419,7 @@ export default function Page(props) {
                 {
                     monster.abilities.length > 0 ?
                     (
-                        <div className="flex-row py-1">
+                        <div className="flex-row py-1 whitespace-pre-line">
                             <hr className="bg-slate-50" />
                             <ul className="overflow-y-auto max-h-64">
                                 {monster.abilities.map((ability, index) => {
@@ -415,24 +453,21 @@ export default function Page(props) {
                     <input
                     className="mx-2"
                     type={'checkbox'}
+                    checked={ability.isAction}
                     onChange={e => setAbility({...ability, isAction: e.target.checked})}
+                    onKeyDown={e => e.key === 'Enter' ? setAbility({...ability, isAction: !ability.isAction}): e}
                     />
                 </div>
                 <div className="flex-row">
                     <label>Description</label>
                 </div>
-                <div className="flex-row min-h-36">
-                    <textarea
-                    className="text-slate-950 w-full h-32"
-                    value={ability.description}
+                <div className="flex-row ">
+                    <TextArea
+                    className="text-slate-950 w-full h-32 p-2"
+                    buttonName={'Add Ability'}
                     onChange={e => setAbility({...ability, description: e.target.value})}
-                    onKeyDown={e => e.key === 'Enter' && e.ctrlKey ? handleAddAbility(e) : e}
+                    handleSubmit={handleAddAbility}
                     />
-                </div>
-                <div className="flex-row pb-2">
-                    <button 
-                    className="w-full text-center rounded border border-solid bg-slate-950 hover:bg-slate-400 hover:text-slate-950 hover:font-extrabold hover: border-slate-950 hover:border-l-2 hover:border-t-2" 
-                    onClick={handleAddAbility}>Add Ability</button>
                 </div>
             </>
         )
@@ -461,17 +496,18 @@ export default function Page(props) {
                     (
                         <div className="flex-row w-full py-1">
                             <hr className="bg-slate-50" />
-                            <ul className="overflow-y-auto">
+                            <ul className="overflow-y-auto max-h-64">
                                 {
                                     monster.legendaryActions.map((ele,index) => {
-                                        <li key={index}>
-                                            <DeleteButton onClick={e => {
-                                                e.preventDefault()
-                                                setMonster({...monster, legendaryActions: monster.legendaryActions.filter((e,i) => i !== index)})
-                                            }} />
-                                            <strong>{ele.name}</strong> {ele.description}
-                                        </li>
-                                    })
+                                       return( 
+                                            <li key={index}>
+                                                <DeleteButton onClick={e => {
+                                                    e.preventDefault()
+                                                    setMonster({...monster, legendaryActions: monster.legendaryActions.filter((e,i) => i !== index)})
+                                                }} />
+                                                <strong>{ele.name}</strong> {ele.description}
+                                            </li>
+                                    )})
                                 }
                             </ul>
                             <hr className="bg-slate-50" />
@@ -653,6 +689,77 @@ export default function Page(props) {
         )
     }
 
+    const renderLairActionsControl = hasLair => {
+        if(!hasLair) { return }
+
+        return (
+            <>
+                <div className="flex-row w-full text-xl">
+                    <label>Lair Description</label>
+                </div>
+                <div className="flex-row w-full text-slate-950">
+                    <textarea
+                    className="p-1 h-24 w-full"
+                    value={monster.lairDescription}
+                    onChange={e => setMonster({...monster, lairDescription: e.target.value})}
+                    />
+                </div>
+                <div className="flex-row w-full text-xl">
+                    <label>Lair Actions</label>
+                </div>
+                {
+                    monster.lairActions.length > 0 ?
+                    (
+                        <div className="flex-row w-full py-1">
+                            <hr className="bg-slate-50" />
+                            <ul className="overflow-y-auto">
+                                {
+                                    monster.lairActions.map((ele,index) => {
+                                        <li key={index}>
+                                            <DeleteButton onClick={e => {
+                                                e.preventDefault()
+                                                setMonster({...monster, lairActions: monster.lairActions.filter((e,i) => i !== index)})
+                                            }} />
+                                            <strong>{ele.name}</strong> {ele.description}
+                                        </li>
+                                    })
+                                }
+                            </ul>
+                            <hr className="bg-slate-50" />
+                        </div>
+                    ): undefined
+                }
+                <div className="flex-row w-full">
+                    <label>Name</label>
+                </div>
+                <div className="flex-row w-full">
+                    <input
+                    type={'text'}
+                    className="px-1"
+                    value={lairAction.name}
+                    onChange={e => setLairAction({...lairAction, name: e.target.value})}
+                    />
+                </div>
+                <div className="flex-row w-full">
+                    <label>Description</label>
+                </div>
+                <div className="flex-row w-full">
+                    <textarea
+                    className="p-1 w-full h-36"
+                    value={lairAction.description}
+                    onChange={e => setLairAction({...lairAction, description: e.target.value})}
+                    onKeyDown={e => e.key === 'Enter' && e.ctrlKey ? handleAddLairAction(e) : e}
+                    />
+                </div>
+                <div className="flex-row w-fit mx-auto">
+                    <button 
+                    className="px-4 rounded border border-solid bg-slate-950 hover:bg-slate-400 hover:text-slate-950 hover:font-extrabold hover: border-slate-950 hover:border-l-2 hover:border-t-2" 
+                    onClick={handleAddLairAction}>Add Lair Action</button>
+                </div>
+            </>
+        )
+    }
+
     return (
         <div className="container py-3 mx-auto bg-slate-800 text-slate-50 rounded-xl">
             <Link className="px-8" href={'/'}>Home</Link>
@@ -662,12 +769,12 @@ export default function Page(props) {
                     
                     <hr className="bg-slate-50 h-1"/>
                     {/* Stat Block */}
-                    <div className="w-[1000px] flex bg-[#FDF1DC] mx-auto flex-wrap text-red-900 text-left">
+                    <div className="w-[1250px] flex bg-[#FDF1DC] mx-auto flex-wrap text-red-900 text-left">
                         <div className="w-full flex-row self-start">
                             <hr className="bg-[#E69A28] h-2"/>
                         </div>
 
-                        <div className="px-1 flex-col w-[50%] flex flex-wrap">
+                        <div className="px-2 flex-col w-[50%] flex flex-wrap">
                             <div className="flex-row text-2xl">
                                 <h2 ><strong>{monster.name}</strong></h2>
                             </div>
@@ -769,13 +876,103 @@ export default function Page(props) {
                             <div className="flex-row">
                                 <h4><strong>Challenge</strong> {monster.challenge} ({monster.experience.toLocaleString()} XP)</h4>
                             </div>
+
+                            {
+                                monster.abilities.filter(ele => !ele.isAction).length > 0 ? (
+                                <>
+                                    <hr className="bg-red-700 h-[3px]"/>
+                                    <div className="flex-row flex flex-wrap">
+                                        {monster.abilities.filter(ele => !ele.isAction).map((ele, index) => {
+                                            return (
+                                                <div key={index} className="flex-row my-1">
+                                                    <p><strong>{ele.name}.</strong> {ele.description}</p>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                </>):undefined
+                            }
+
+                            {
+                                monster.abilities.filter(ele => ele.isAction).length > 0 ? (
+                                    <>
+                                        <h3 className="text-2xl">Actions</h3>
+                                        <hr className="bg-red-700 h-[3px] mb-2" />
+                                        <div className="flex-row flex flex-wrap">
+                                            {monster.abilities.filter(ele => ele.isAction).map((ele, index) => {
+                                                return (
+                                                    <div key={index} className="flex-row my-1 whitespace-pre-line">
+                                                        <p><strong>{ele.name}.</strong> {ele.description}</p>
+                                                    </div>
+                                                )
+                                            })}
+                                        </div>
+                                    </>
+                                ): undefined
+                            }
                             {/* work on adding skills, damage immunities, condition immunities, senses, languages, challenge */}
                         </div>
 
-                        <div className="flex-col flex flex-wrap  w-[50%]">
-                            <div className="flex-row">
-
+                        <div className="flex-col px-2 flex flex-wrap  w-[50%]">
+                            {
+                                monster.abilities.filter(ele => ele.isAction).length === 0 ?
+                                (<>
+                                    <h3 className="text-2xl">Actions</h3>
+                                    <hr className="bg-red-700 h-[3px] mb-2" />
+                                </>): undefined
+                            }
+                            <div className="flex-row flex flex-wrap">
+                                {monster.actions.map(({name, attackType, modifier, reach, targets, hits, description}, index) => {
+                                    return (
+                                        <div key={index} className="flex-row my-1 whitespace-pre-line">
+                                            <p>
+                                                <strong>{name}. </strong><em>{attackType}:</em> {modifier >= 0 ? '+' : ''}{modifier.toLocaleString()} to hit, reach {reach}, {targets} target{targets > 1 ? 's':''}. <em>Hit: </em> {hits.map(({dieType, damageType}) => `${averageRoll(dieType)} (${dieType}) ${damageType} damage`).join(' and ')}. {description}
+                                            </p>
+                                        </div>
+                                    )
+                                })}
                             </div>
+                            
+                            {
+                                monster.legendaryDescription !== '' ? (
+                                    <>
+                                    <h3 className="text-2xl">Legendary Actions</h3>
+                                    <hr className="bg-red-700 h-[3px] mb-2" />
+                                    <div className="flex-row flex flex-wrap">
+                                        <div className="flex-row my-1, whitespace-pre-line">
+                                            <p>{monster.legendaryDescription}</p>
+                                        </div>
+                                        {monster.legendaryActions.map(({name, description}) => {
+                                            return (
+                                                <div className="flex-row my-1, whitespace-pre-line">
+                                                    <p><strong>{name}.</strong> {description}</p>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                    </>
+                                ): undefined
+                            }
+                            {
+                                monster.lairActions !== '' ? (
+                                    <>
+                                    <h3 className="text-2xl">Legendary Actions</h3>
+                                    <hr className="bg-red-700 h-[3px] mb-2" />
+                                    <div className="flex-row flex flex-wrap">
+                                        <div className="flex-row my-1, whitespace-pre-line">
+                                            <p>{monster.legendaryDescription}</p>
+                                        </div>
+                                        {monster.legendaryActions.map(({name, description}) => {
+                                            return (
+                                                <div className="flex-row my-1, whitespace-pre-line">
+                                                    <p><strong>{name}.</strong> {description}</p>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                    </>
+                                ): undefined
+                            }
                         </div>
                         
                         <div className="w-full flex-row self-end">
@@ -819,9 +1016,9 @@ export default function Page(props) {
                     </div>
 
                     {/* Armor Class */}
-                    <div className="flex-col flex">
-                        <label htmlFor="armorClass">Armor Class</label>
-                        <input className="text-slate-950" id="armorClass" type={'number'} min={1} value={monster.armorClass} onChange={handleGeneralChange}></input>
+                    <div className="flex-col flex w-fit">
+                        <label htmlFor="armorClass">AC</label>
+                        <input className="text-slate-950 w-fit" id="armorClass" max={99} type={'number'} min={1} value={monster.armorClass} onChange={handleGeneralChange}></input>
                     </div>
 
                     {/* Armor Type */}
@@ -847,7 +1044,12 @@ export default function Page(props) {
                     <div className="flex-col flex">
                         <label htmlFor="movementSpeed">Movement Speed(s)</label>
                         <div className="flex-row">
-                            <input className="text-slate-950" id="movementSpeed" type={'text'} value={movementSpeed} onChange={e=>setMovementSpeed(e.target.value)} onKeyDown={e => e.key === 'Enter' ? handleAddMovementSpeed : e.key}></input>
+                            <input 
+                            className="text-slate-950" id="movementSpeed" 
+                            type={'text'} 
+                            value={movementSpeed} 
+                            onChange={e=>setMovementSpeed(e.target.value)} 
+                            onKeyDown={e => e.key === 'Enter' ? handleAddMovementSpeed(e) : e.key}></input>
                             <button className="px-2" onClick={handleAddMovementSpeed}>+</button>
                         </div>
                     </div>
@@ -1153,7 +1355,71 @@ export default function Page(props) {
                         </div>
                     </div>
                 </div>
-                
+
+                <div className="flex-row flex gap-2 flex-wrap w-full">
+                    <div className="flex-col justify-items-end">
+                        <div className="flex-row flex-grow text-right">
+                            <label>Damage Resistances?</label>
+                            <input 
+                            className="ml-2" 
+                            type={'checkbox'} 
+                            value={options.hasResistance} 
+                            onChange={e => handleOptionChange(e.target.checked, 'hasResistance', 'damageResistances')} />
+                        </div>
+                        <div className="flex-row text-right">
+                            <label>Damage Immunities?</label>
+                            <input 
+                            className="ml-2" 
+                            type={'checkbox'} 
+                            value={options.hasDamageImmunities} 
+                            onChange={e => handleOptionChange(e.target.checked, 'hasDamageImmunities', 'damageImmunities')}/>
+                        </div>
+                        <div className="flex-row text-right">
+                            <label>Damage Vulnerabilities?</label>
+                            <input 
+                            className="ml-2" 
+                            type={'checkbox'} 
+                            value={options.hasDamageVulnerabilities} 
+                            onChange={e => handleOptionChange(e.target.checked, 'hasDamageVulnerabilities','damageVulnerabilites')}/>
+                        </div>
+                        <div className="flex-row text-right">
+                            <label>Condition Immunities?</label>
+                            <input 
+                            className="ml-2" 
+                            type={'checkbox'} 
+                            value={options.hasConditionImmunities} 
+                            onChange={e => handleOptionChange(e.target.checked, 'hasConditionImmunities', 'conditionImmunities')}></input>
+                        </div>
+                    </div>
+                    <div className="flex-col flex">
+                        {renderResitanceControl(options.hasResistance)}
+                    </div>
+                    <div className="flex-col flex">
+                        {renderDamageImmunitiesControl(options.hasDamageImmunities)}
+                    </div>
+                    <div className="flex-col flex">
+                        {renderDamageVulnerabilitesControl(options.hasDamageVulnerabilities)}
+                    </div>
+                    <div className="flex-col flex">
+                        {renderConditionImmunitiesControl(options.hasConditionImmunities)}
+                    </div>
+                </div>
+
+                <div className="flex-row flex gap-2 flex-wrap w-full ">
+                    <div className="flex-col justify-items-end">
+                        <div className="flex-row text-right">
+                            <label>Abilities?</label>
+                            <input 
+                            className="ml-2" 
+                            type={'checkbox'} 
+                            value={options.hasAbilities} 
+                            onChange={e => handleOptionChange(e.target.checked, 'hasAbilities', 'abilities')}/>
+                        </div>
+                    </div>
+                    <div className="flex-col flex w-full ">
+                        {renderAbilitiesControl(options.hasAbilities)}
+                    </div>
+                </div>
 
                 {/* Actions */}
                 <div className="flex-row flex gap-2 flex-wrap w-full">
@@ -1171,7 +1437,7 @@ export default function Page(props) {
                                                 return (
                                                     <li key={index}>
                                                         <DeleteButton onClick={e => setMonster({...monster, actions: monster.actions.filter((e,i) => i !== index)})}/>
-                                                        <strong>{ele.name}.</strong> <em>{ele.attackType}</em>: {ele.modifier >= 0 ? '+' : '-'}{ele.modifier} to hit, {ele.reach}., {ele.targets} target{ele.targets > 1 ? 's' : ''}, <em>Hit:</em> {ele.hits.map(e => `${averageRoll(e.dieType)} (${e.dieType}) ${e.damageType} damage`).join('and')}
+                                                        <strong>{ele.name}.</strong> <em>{ele.attackType}</em>: {ele.modifier >= 0 ? '+' : '-'}{ele.modifier} to hit, {ele.reach}, {ele.targets} target{ele.targets > 1 ? 's' : ''}, <em>Hit:</em> {ele.hits.map(e => `${averageRoll(e.dieType)} (${e.dieType}) ${e.damageType} damage`).join('and')}. {ele.description}
                                                     </li>
                                                 )
                                             })
@@ -1283,15 +1549,24 @@ export default function Page(props) {
                                     type={'text'}
                                     value={hit.damageType}
                                     onChange={e => setHit({...hit, damageType: e.target.value})}
-                                    onKeyDown={e => e.key === 'Enter' ? handleAddHit : e}
+                                    onKeyDown={e => e.key === 'Enter' ? handleAddHit(e) : e}
                                     ></input>
-
-                                    <button
+                                    <AddButton 
                                     disabled={hit.damageType === '' || hit.dieType === '' || !isDiceNotation(hit.dieType)}
                                     onClick={handleAddHit}
-                                    >
-                                        +
-                                    </button>
+                                    />
+                                </div>
+                                <div className="flex-row flex flex-wrap w-full">
+                                    <div className="flex-row">
+                                        <label>Description</label>
+                                    </div>
+                                    <div className="flex-row w-full">
+                                        <textarea
+                                        className="p-1 w-full h-28 text-slate-950"
+                                        value={action.description}
+                                        onChange={e => setAction({...action, description: e.target.value})}
+                                        />
+                                    </div>
                                 </div>
                             </div>
 
@@ -1307,7 +1582,7 @@ export default function Page(props) {
                                     let newMonster = {...monster}
                                     newMonster.actions.push(action)
                                     setMonster(newMonster)
-                                    setAction(createAction('','',0,'',0,[]))
+                                    setAction(createAction('','Melee Weapon Attack',0,'',0,[],''))
                                 }}
                                 >
                                     Add Action
@@ -1325,103 +1600,55 @@ export default function Page(props) {
                     as code is refactored to help reduce the amount of copied code. This will make it easier to update the UI
                     as it progresses
                 */}
-                <div className="flex-row flex gap-2 flex-wrap w-full border border-solid">
-                    <div className="flex-col border border-solid justify-items-end">
-                        <div className="flex-row flex-grow text-right">
-                            <label>Damage Resistances?</label>
-                            <input 
-                            className="ml-2" 
-                            type={'checkbox'} 
-                            value={options.hasResistance} 
-                            onChange={e => handleOptionChange(e.target.checked, 'hasResistance', 'damageResistances')} />
-                        </div>
-                        <div className="flex-row text-right">
-                            <label>Damage Immunities?</label>
-                            <input 
-                            className="ml-2" 
-                            type={'checkbox'} 
-                            value={options.hasDamageImmunities} 
-                            onChange={e => handleOptionChange(e.target.checked, 'hasDamageImmunities', 'damageImmunities')}/>
-                        </div>
-                        <div className="flex-row text-right">
-                            <label>Damage Vulnerabilities?</label>
-                            <input 
-                            className="ml-2" 
-                            type={'checkbox'} 
-                            value={options.hasDamageVulnerabilities} 
-                            onChange={e => handleOptionChange(e.target.checked, 'hasDamageVulnerabilities','damageVulnerabilites')}/>
-                        </div>
-                        <div className="flex-row text-right">
-                            <label>Condition Immunities?</label>
-                            <input 
-                            className="ml-2" 
-                            type={'checkbox'} 
-                            value={options.hasConditionImmunities} 
-                            onChange={e => handleOptionChange(e.target.checked, 'hasConditionImmunities', 'conditionImmunities')}></input>
-                        </div>
+                
+                <div className="flex-row flex gap-2 flex-wrap w-full">
+                    <div className="flex-col text-right">
+                        <label>Legendary?</label>
+                        <input 
+                        className="ml-2" 
+                        type={'checkbox'} 
+                        value={options.isLegendary} 
+                        onChange={handleIsLegendary}/>
                     </div>
-                    <div className="flex-col flex">
-                        {renderResitanceControl(options.hasResistance)}
+                    <div className="flex-col text-right">
+                        <label>Mythic?</label>
+                        <input 
+                        className="ml-2" 
+                        type={'checkbox'} 
+                        value={options.isMythic} 
+                        onChange={handleIsMythic}></input>
                     </div>
-                    <div className="flex-col flex">
-                        {renderDamageImmunitiesControl(options.hasDamageImmunities)}
+                    <div className="flex-col text-right">
+                        <label>Has Lair?</label>
+                        <input
+                        className="ml-2"
+                        type={'checkbox'}
+                        value={options.hasLair}
+                        onChange={handleHasLair} />
                     </div>
-                    <div className="flex-col flex">
-                        {renderDamageVulnerabilitesControl(options.hasDamageVulnerabilities)}
+                    <div className="flex-col text-right">
+                        <label>Regional Effects?</label>
+                        <input 
+                        className="ml-2" 
+                        type={'checkbox'} 
+                        value={options.hasRegionEffects} 
+                        onChange={handleHasRegionalEffect}/>
                     </div>
-                    <div className="flex-col flex">
-                        {renderConditionImmunitiesControl(options.hasConditionImmunities)}
-                    </div>
-                </div>
-                <div className="flex-row flex gap-2 flex-wrap w-full border border-solid">
-                    <div className="flex-col border border-solid justify-items-end">
-                        <div className="flex-row text-right">
-                            <label>Abilities?</label>
-                            <input 
-                            className="ml-2" 
-                            type={'checkbox'} 
-                            value={options.hasAbilities} 
-                            onChange={e => handleOptionChange(e.target.checked, 'hasAbilities', 'abilities')}/>
-                        </div>
-                        <div className="flex-row text-right">
-                            <label>Regional Effects?</label>
-                            <input 
-                            className="ml-2" 
-                            type={'checkbox'} 
-                            value={options.hasRegionEffects} 
-                            onChange={handleHasRegionalEffect}/>
-                        </div>
-                        <div className="flex-row text-right">
-                            <label>Legendary?</label>
-                            <input 
-                            className="ml-2" 
-                            type={'checkbox'} 
-                            value={options.isLegendary} 
-                            onChange={handleIsLegendary}/>
-                        </div>
-                        <div className="flex-row text-right">
-                            <label>Mythic?</label>
-                            <input 
-                            className="ml-2" 
-                            type={'checkbox'} 
-                            value={options.isMythic} 
-                            onChange={handleIsMythic}></input>
-                        </div>
-                    </div>
-
-                    <div className="flex-col flex w-96 ">
-                        {renderAbilitiesControl(options.hasAbilities)}
-                    </div>
-
                 </div>
                 <div className="flex-row flex w-full flex-wrap ">
                     {renderLegendaryActionsControl(options.isLegendary)}
                 </div>
                 <div className="flex-row flex w-full flex-wrap">
-                    {renderRegionalEffectsControl(options.hasRegionEffects)}
+                    {renderMythicActionsControl(options.isMythic)}
                 </div>
                 <div className="flex-row flex w-full flex-wrap">
-                    {renderMythicActionsControl(options.isMythic)}
+                    {renderLairActionsControl(options.hasLair)}
+                </div>
+                <div className="flex-row flex w-full flex-wrap">
+                    {renderRegionalEffectsControl(options.hasRegionEffects)}
+                </div>
+                <div className="flex-row w-full">
+                    <SubmitButton buttonName="Create Creature" onClick={handleCreateCreature} />
                 </div>
             </form>
         </div>

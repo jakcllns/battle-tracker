@@ -2,24 +2,24 @@ import AddButton from "../AddButton/AddButton"
 
 const { useState } = require("react")
 
-const ListInput = props => {
+const ListInput = ({type, handleAdd}) => {
     const [inputVal, setInputVal] = useState('')
 
-    const handleAdd = event => {
+    const addHandler = event => {
         event.preventDefault()
-        props.handleAdd(inputVal)
+        handleAdd(inputVal)
         setInputVal('')
     }
     return (
         <>
             <input
             className="text-slate-950"
-            type={props.type}
+            type={type}
             value={inputVal}
             onChange={e => setInputVal(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' ? handleAdd(e) : e}
+            onKeyDown={e => e.key === 'Enter' ? addHandler(e) : e}
             ></input>
-            <AddButton onClick={handleAdd} />
+            <AddButton onClick={addHandler} />
         </>
     )
 }

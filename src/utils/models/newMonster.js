@@ -105,7 +105,8 @@ export const NewMonsterSchema = new Schema({
             },
             description: {
                 type: String
-            }
+            },
+            isAction: { type: Boolean}
         }
     ],
     actions: [
@@ -132,6 +133,7 @@ export const NewMonsterSchema = new Schema({
             description: {type: String}
         }
     ],
+    lairDescription: {type: String},
     lairActions: [
         {
             name: {type: String},
