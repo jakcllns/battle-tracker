@@ -36,7 +36,9 @@ export const initializeMonster = () => {
             "legendaryActions": [],
             "lairActions": [],
             "regionalEffects": [],
-            "mythicActions": []
+            "regionalDescription": "",
+            "mythicActions": [],
+            "mythicDescription": ""
         }
     )    
 }

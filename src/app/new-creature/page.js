@@ -39,8 +39,10 @@ export default function Page(props) {
     const [language, setLanguage] = useState('')
     const [action, setAction] = useState(createAction('','Melee Weapon Attack',0,'',1, []))
     const [legendaryAction, setLegendaryAction] = useState(createLegendaryAction('',''))
+    const [regionalEffect, setRegionalEffect] = useState({name: '', description: ''})
     const [ability, setAbility] = useState(createAbilities('',''))
     const [hit, setHit] = useState({dieType: '', damageType: ''})
+    const [mythicAction, setMythicAction] = useState({name: '', description: ''})
 
     useEffect(() => console.log(action), [action])
 
@@ -186,6 +188,9 @@ export default function Page(props) {
 
     const handleAddAbility = event => {
         event.preventDefault()
+
+        if(ability.description === '' || ability.name === '' || monster.abilities.some(ele => ele.name === ability.name)) { return }
+
         const newMonster = {...monster}
         newMonster.abilities.push(ability)
         setAbility(createAbilities('',''))
@@ -197,6 +202,53 @@ export default function Page(props) {
         const newMonster = {...monster}
         newMonster.legendaryActions.push(legendaryAction)
         setLegendaryAction(createLegendaryAction('',''))
+        setMonster(newMonster)
+    }
+
+    const handleIsLegendary = event => {
+        const checked = event.target.checked
+
+        if(!checked) {
+            const newMonster = {...monster}
+            newMonster.legendaryDescription = ''
+            newMonster.legendaryActions = []
+            setMonster(newMonster)
+        }
+
+        setOptions({...options, isLegendary: checked})
+    }
+
+    const handleHasRegionalEffect = event => {
+        const checked = event.target.checked
+        if(!checked) {
+            setMonster({...monster, regionalDescription: '', regionalEffects: []})
+        }
+
+        setOptions({...options, hasRegionEffects:  checked})
+    }
+
+    const handleIsMythic = event => {
+        const checked = event.target.checked
+        if(!checked) {
+            setMonster({...monster, mythicDescription: '' , mythicActions: []})
+        }
+
+        setOptions({...options, isMythic: checked})
+    }
+
+    const handleAddRegionalEffect = event => {
+        event.preventDefault()
+        const newMonster = {...monster}
+        newMonster.regionalEffects.push(regionalEffect)
+        setRegionalEffect({name: '', description: ''})
+        setMonster(newMonster)
+    }
+
+    const handleAddMythicAction = event => {
+        event.preventDefault()
+        const newMonster = {...monster}
+        newMonster.mythicActions.push(mythicAction)
+        setMythicAction({name: '', description: ''})
         setMonster(newMonster)
     }
 
@@ -391,13 +443,23 @@ export default function Page(props) {
 
         return (
             <>
-                <div className="flex-row text-xl">
+                <div className="flex-row w-full text-xl pb-2">
+                    <label>Legendary Description</label>
+                </div>
+                <div className="flex-row w-full text-slate-950">
+                    <textarea
+                    className="p-1 w-full h-24"
+                    value={monster.legendaryDescription}
+                    onChange={e => setMonster({...monster, legendaryDescription: e.target.value})}
+                    />
+                </div>
+                <div className="flex-row w-full text-xl">
                     <label>Legendary Actions</label>
                 </div>
                 {
                     monster.legendaryActions.length > 0 ?
                     (
-                        <div className="flex-row py-1">
+                        <div className="flex-row w-full py-1">
                             <hr className="bg-slate-50" />
                             <ul className="overflow-y-auto">
                                 {
@@ -416,32 +478,176 @@ export default function Page(props) {
                         </div>
                     ): undefined
                 }
-                <div className="flex-row">
+                <div className="flex-row w-full">
                     <label>Name</label>
+                </div>
+                <div className="flex-row text-slate-950 w-full">
                     <input
                     type={'text'}
-                    className="ml-1 w-full"
-                    value={legendaryAction}
+                    className="pl-1"
+                    value={legendaryAction.name}
                     onChange={e => setLegendaryAction({...legendaryAction, name: e.target.value})}
                     />
                 </div>
 
-                <div className="flex-row">
+                <div className="flex-row w-full">
                     <label>Description</label>
                 </div>
 
-                <div className="flex-row">
+                <div className="flex-row w-full">
                     <textarea
-                    className="text-slate-950 w-full h-32"
+                    className="text-slate-950 w-full h-32 p-1"
                     value={legendaryAction.description}
                     onChange={e => setLegendaryAction({...legendaryAction, description: e.target.value})}
                     onKeyDown={e => e.key === 'Enter' && e.ctrlKey ? handleAddLegendaryAction(e) : e}
                     />
                 </div>
-                <div className="flex-row pb-2">
+                <div className="flex-row w-fit mx-auto">
                     <button 
-                    className="w-full text-center rounded border border-solid bg-slate-950 hover:bg-slate-400 hover:text-slate-950 hover:font-extrabold hover: border-slate-950 hover:border-l-2 hover:border-t-2" 
+                    className="px-4 rounded border border-solid bg-slate-950 hover:bg-slate-400 hover:text-slate-950 hover:font-extrabold hover: border-slate-950 hover:border-l-2 hover:border-t-2" 
                     onClick={handleAddLegendaryAction}>Add Legendary Action</button>
+                </div>
+            </>
+        )
+    }
+
+    const renderRegionalEffectsControl = hasRegionEffects => {
+        if(!hasRegionEffects) { return }
+
+        return (
+            <>
+                <div className="flex-row w-full text-xl">
+                    <label>Regional Effect Description</label>
+                </div>
+                <div className="flex-row w-full text-slate-950">
+                    <textarea
+                    className="p-1 h-24 w-full"
+                    value={monster.regionalDescription}
+                    onChange={e => setMonster({...monster, regionalDescription: e.target.value})}
+                    />
+                </div>
+                <div className="flex-row w-full text-xl">
+                    <label>Regional Effects</label>
+                </div>
+                {
+                    monster.regionalEffects.length > 0 ?
+                    (
+                        <div className="flex-row w-full py-1">
+                            <hr className="bg-slate-50" />
+                            <ul className="overflow-y-auto">
+                                {
+                                    monster.regionalEffects.map((ele,index) => {
+                                        <li key={index}>
+                                            <DeleteButton onClick={e => {
+                                                e.preventDefault()
+                                                setMonster({...monster, regionalEffects: monster.regionalEffects.filter((e,i) => i !== index)})
+                                            }} />
+                                            <strong>{ele.name}</strong> {ele.description}
+                                        </li>
+                                    })
+                                }
+                            </ul>
+                            <hr className="bg-slate-50" />
+                        </div>
+                    ): undefined
+                }
+                <div className="flex-row w-full">
+                    <label>Name</label>
+                </div>
+                <div className="flex-row w-full">
+                    <input
+                    type={'text'}
+                    className="px-1"
+                    value={regionalEffect.name}
+                    onChange={e => setRegionalEffect({...regionalEffect, name: e.target.value})}
+                    />
+                </div>
+                <div className="flex-row w-full">
+                    <label>Description</label>
+                </div>
+                <div className="flex-row w-full">
+                    <textarea
+                    className="p-1 w-full h-36"
+                    value={regionalEffect.description}
+                    onChange={e => setRegionalEffect({...regionalEffect, description: e.target.value})}
+                    onKeyDown={e => e.key === 'Enter' && e.ctrlKey ? handleAddRegionalEffect(e) : e}
+                    />
+                </div>
+                <div className="flex-row w-fit mx-auto">
+                    <button 
+                    className="px-4 rounded border border-solid bg-slate-950 hover:bg-slate-400 hover:text-slate-950 hover:font-extrabold hover: border-slate-950 hover:border-l-2 hover:border-t-2" 
+                    onClick={handleAddRegionalEffect}>Add Regional Effect</button>
+                </div>
+            </>
+        )
+    }
+
+    const renderMythicActionsControl = isMythic => {
+        if(!isMythic) { return }
+
+        return (
+            <>
+                <div className="flex-row w-full text-xl">
+                    <label>Mythic Description</label>
+                </div>
+                <div className="flex-row w-full text-slate-950">
+                    <textarea
+                    className="p-1 h-24 w-full"
+                    value={monster.mythicDescription}
+                    onChange={e => setMonster({...monster, mythicDescription: e.target.value})}
+                    />
+                </div>
+                <div className="flex-row w-full text-xl">
+                    <label>Mythic Actions</label>
+                </div>
+                {
+                    monster.mythicActions.length > 0 ?
+                    (
+                        <div className="flex-row w-full py-1">
+                            <hr className="bg-slate-50" />
+                            <ul className="overflow-y-auto">
+                                {
+                                    monster.mythicActions.map((ele,index) => {
+                                        <li key={index}>
+                                            <DeleteButton onClick={e => {
+                                                e.preventDefault()
+                                                setMonster({...monster, mythicActions: monster.mythicActions.filter((e,i) => i !== index)})
+                                            }} />
+                                            <strong>{ele.name}</strong> {ele.description}
+                                        </li>
+                                    })
+                                }
+                            </ul>
+                            <hr className="bg-slate-50" />
+                        </div>
+                    ): undefined
+                }
+                <div className="flex-row w-full">
+                    <label>Name</label>
+                </div>
+                <div className="flex-row w-full">
+                    <input
+                    type={'text'}
+                    className="px-1"
+                    value={mythicAction.name}
+                    onChange={e => setMythicAction({...mythicAction, name: e.target.value})}
+                    />
+                </div>
+                <div className="flex-row w-full">
+                    <label>Description</label>
+                </div>
+                <div className="flex-row w-full">
+                    <textarea
+                    className="p-1 w-full h-36"
+                    value={mythicAction.description}
+                    onChange={e => setMythicAction({...mythicAction, description: e.target.value})}
+                    onKeyDown={e => e.key === 'Enter' && e.ctrlKey ? handleAddMythicAction(e) : e}
+                    />
+                </div>
+                <div className="flex-row w-fit mx-auto">
+                    <button 
+                    className="px-4 rounded border border-solid bg-slate-950 hover:bg-slate-400 hover:text-slate-950 hover:font-extrabold hover: border-slate-950 hover:border-l-2 hover:border-t-2" 
+                    onClick={handleAddMythicAction}>Add Mythic Action</button>
                 </div>
             </>
         )
@@ -1095,7 +1301,7 @@ export default function Page(props) {
                         <div className="w-full">
                             <div className="mx-auto w-fit">
                                 <button
-                                className="bg-slate-400 border border-solid border-slate-900 rounded p-2 mx-auto text-slate-950 hover:bg-slate-300"
+                                className="w-full text-center rounded border border-solid bg-slate-950 hover:bg-slate-400 hover:text-slate-950 hover:font-extrabold hover: border-slate-950 hover:border-l-2 hover:border-t-2 px-2"
                                 onClick={e => {
                                     e.preventDefault()
                                     let newMonster = {...monster}
@@ -1154,16 +1360,16 @@ export default function Page(props) {
                             onChange={e => handleOptionChange(e.target.checked, 'hasConditionImmunities', 'conditionImmunities')}></input>
                         </div>
                     </div>
-                    <div className="flex-col">
+                    <div className="flex-col flex">
                         {renderResitanceControl(options.hasResistance)}
                     </div>
-                    <div className="flex-col">
+                    <div className="flex-col flex">
                         {renderDamageImmunitiesControl(options.hasDamageImmunities)}
                     </div>
-                    <div className="flex-col">
+                    <div className="flex-col flex">
                         {renderDamageVulnerabilitesControl(options.hasDamageVulnerabilities)}
                     </div>
-                    <div className="flex-col">
+                    <div className="flex-col flex">
                         {renderConditionImmunitiesControl(options.hasConditionImmunities)}
                     </div>
                 </div>
@@ -1183,7 +1389,7 @@ export default function Page(props) {
                             className="ml-2" 
                             type={'checkbox'} 
                             value={options.hasRegionEffects} 
-                            onChange={e => handleOptionChange(e.target.checked, 'hasRegionEffects', 'regionalEffects')}/>
+                            onChange={handleHasRegionalEffect}/>
                         </div>
                         <div className="flex-row text-right">
                             <label>Legendary?</label>
@@ -1191,21 +1397,31 @@ export default function Page(props) {
                             className="ml-2" 
                             type={'checkbox'} 
                             value={options.isLegendary} 
-                            onChange={e => handleOptionChange(e.target.checked, 'isLegendary', 'legendaryActions')}/>
+                            onChange={handleIsLegendary}/>
                         </div>
                         <div className="flex-row text-right">
                             <label>Mythic?</label>
-                            <input className="ml-2" type={'checkbox'} value={options.isMythic} onChange={e => setOptions({...options, isMythic: e.target.value})}></input>
+                            <input 
+                            className="ml-2" 
+                            type={'checkbox'} 
+                            value={options.isMythic} 
+                            onChange={handleIsMythic}></input>
                         </div>
                     </div>
 
-                    <div className="flex-col w-96 mx-2">
+                    <div className="flex-col flex w-96 ">
                         {renderAbilitiesControl(options.hasAbilities)}
                     </div>
 
-                    <div className="flex-col w-96 mx-2">
-                        {renderLegendaryActionsControl(options.isLegendary)}
-                    </div>
+                </div>
+                <div className="flex-row flex w-full flex-wrap ">
+                    {renderLegendaryActionsControl(options.isLegendary)}
+                </div>
+                <div className="flex-row flex w-full flex-wrap">
+                    {renderRegionalEffectsControl(options.hasRegionEffects)}
+                </div>
+                <div className="flex-row flex w-full flex-wrap">
+                    {renderMythicActionsControl(options.isMythic)}
                 </div>
             </form>
         </div>

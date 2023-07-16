@@ -144,12 +144,16 @@ export const NewMonsterSchema = new Schema({
             description: {type: String}
         }
     ],
+    regionalDescription: {
+        type: String
+    },
     mythicActions: [
         {
             name: {type: String},
             description: {type: String}
         }
     ],
+    mythicDescription: {type: String},
     id_name: {
         type: String,
         lowercase: true,
