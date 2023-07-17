@@ -288,6 +288,16 @@ export default function Page(props) {
     const handleCreateCreature = event => {
         event.preventDefault()
         console.log(JSON.stringify({...monster, id_name: monster.name.toLowerCase().replace(/\s/g, '_')}))
+
+        fetch('api/new-monsters', {
+            method: 'POST',
+            body: JSON.stringify({...monster, id_name: monster.name.toLocaleLowerCase().replace(/\s/g,'_')})
+        })
+        .then( res => res.json())
+        .then( data => {
+            console.log(data)
+        })
+
     }
 
     const renderResitanceControl = (hasResistance) => {
@@ -763,15 +773,15 @@ export default function Page(props) {
     return (
         <div className="container py-3 mx-auto bg-slate-800 text-slate-50 rounded-xl">
             <Link className="px-8" href={'/'}>Home</Link>
-            <form className="container p-8 mx-auto flex flex-wrap gap-x-3 gap-y-2 " onKeyDown={e => e.key === 'Enter' ? e.preventDefault() : e}>
+            <form className="container p-8 mx-auto flex flex-wrap gap-x-3 gap-y-2 text-sm" onKeyDown={e => e.key === 'Enter' ? e.preventDefault() : e}>
                 <div className="flex-row w-full text-center py-3 -mt-3">
                     <h1 className="text-xl mx-auto ">Create New Creature Statblock</h1>
                     
                     <hr className="bg-slate-50 h-1"/>
                     {/* Stat Block */}
-                    <div className="w-[1250px] flex bg-[#FDF1DC] mx-auto flex-wrap text-red-900 text-left">
+                    <div className="w-[1250px] flex bg-[#FDF1DC] parchment mx-auto flex-wrap text-red-900 text-left">
                         <div className="w-full flex-row self-start">
-                            <hr className="bg-[#E69A28] h-2"/>
+                            <hr className="bg-[#E69A28] stat-bar h-2"/>
                         </div>
 
                         <div className="px-2 flex-col w-[50%] flex flex-wrap">
@@ -942,9 +952,9 @@ export default function Page(props) {
                                         <div className="flex-row my-1, whitespace-pre-line">
                                             <p>{monster.legendaryDescription}</p>
                                         </div>
-                                        {monster.legendaryActions.map(({name, description}) => {
+                                        {monster.legendaryActions.map(({name, description}, index) => {
                                             return (
-                                                <div className="flex-row my-1, whitespace-pre-line">
+                                                <div key={index} className="flex-row my-1, whitespace-pre-line">
                                                     <p><strong>{name}.</strong> {description}</p>
                                                 </div>
                                             )
@@ -954,17 +964,57 @@ export default function Page(props) {
                                 ): undefined
                             }
                             {
-                                monster.lairActions !== '' ? (
+                                monster.lairDescription !== '' ? (
                                     <>
-                                    <h3 className="text-2xl">Legendary Actions</h3>
+                                    <h3 className="text-2xl">Lair Actions</h3>
                                     <hr className="bg-red-700 h-[3px] mb-2" />
                                     <div className="flex-row flex flex-wrap">
                                         <div className="flex-row my-1, whitespace-pre-line">
-                                            <p>{monster.legendaryDescription}</p>
+                                            <p>{monster.lairDescription}</p>
                                         </div>
-                                        {monster.legendaryActions.map(({name, description}) => {
+                                        {monster.lairActions.map(({name, description}, index) => {
                                             return (
-                                                <div className="flex-row my-1, whitespace-pre-line">
+                                                <div key={index} className="flex-row my-1, whitespace-pre-line">
+                                                    <p><strong>{name}.</strong> {description}</p>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                    </>
+                                ): undefined
+                            }
+                            {
+                                monster.mythicDescription !== '' ? (
+                                    <>
+                                    <h3 className="text-2xl">Mythic Actions</h3>
+                                    <hr className="bg-red-700 h-[3px] mb-2" />
+                                    <div className="flex-row flex flex-wrap">
+                                        <div className="flex-row my-1, whitespace-pre-line">
+                                            <p>{monster.mythicDescription}</p>
+                                        </div>
+                                        {monster.mythicActions.map(({name, description}, index) => {
+                                            return (
+                                                <div key={index} className="flex-row my-1, whitespace-pre-line">
+                                                    <p><strong>{name}.</strong> {description}</p>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                    </>
+                                ): undefined
+                            }
+                            {
+                                monster.regionalDescription !== '' ? (
+                                    <>
+                                    <h3 className="text-2xl">Regional Effects</h3>
+                                    <hr className="bg-red-700 h-[3px] mb-2" />
+                                    <div className="flex-row flex flex-wrap">
+                                        <div className="flex-row my-1, whitespace-pre-line">
+                                            <p>{monster.regionalDescription}</p>
+                                        </div>
+                                        {monster.regionalEffects.map(({name, description}, index) => {
+                                            return (
+                                                <div key={index} className="flex-row my-1, whitespace-pre-line">
                                                     <p><strong>{name}.</strong> {description}</p>
                                                 </div>
                                             )
@@ -976,7 +1026,7 @@ export default function Page(props) {
                         </div>
                         
                         <div className="w-full flex-row self-end">
-                            <hr className="bg-[#E69A28] h-2"/>
+                            <hr className="bg-[#E69A28] stat-bar h-2"/>
                         </div>
                     </div>
                     <hr className="bg-slate-50 h-1"/>
@@ -1363,7 +1413,7 @@ export default function Page(props) {
                             <input 
                             className="ml-2" 
                             type={'checkbox'} 
-                            value={options.hasResistance} 
+                            checked={options.hasResistance} 
                             onChange={e => handleOptionChange(e.target.checked, 'hasResistance', 'damageResistances')} />
                         </div>
                         <div className="flex-row text-right">
@@ -1371,7 +1421,7 @@ export default function Page(props) {
                             <input 
                             className="ml-2" 
                             type={'checkbox'} 
-                            value={options.hasDamageImmunities} 
+                            checked={options.hasDamageImmunities} 
                             onChange={e => handleOptionChange(e.target.checked, 'hasDamageImmunities', 'damageImmunities')}/>
                         </div>
                         <div className="flex-row text-right">
@@ -1379,7 +1429,7 @@ export default function Page(props) {
                             <input 
                             className="ml-2" 
                             type={'checkbox'} 
-                            value={options.hasDamageVulnerabilities} 
+                            checked={options.hasDamageVulnerabilities} 
                             onChange={e => handleOptionChange(e.target.checked, 'hasDamageVulnerabilities','damageVulnerabilites')}/>
                         </div>
                         <div className="flex-row text-right">
@@ -1387,7 +1437,7 @@ export default function Page(props) {
                             <input 
                             className="ml-2" 
                             type={'checkbox'} 
-                            value={options.hasConditionImmunities} 
+                            checked={options.hasConditionImmunities} 
                             onChange={e => handleOptionChange(e.target.checked, 'hasConditionImmunities', 'conditionImmunities')}></input>
                         </div>
                     </div>
@@ -1412,7 +1462,7 @@ export default function Page(props) {
                             <input 
                             className="ml-2" 
                             type={'checkbox'} 
-                            value={options.hasAbilities} 
+                            checked={options.hasAbilities} 
                             onChange={e => handleOptionChange(e.target.checked, 'hasAbilities', 'abilities')}/>
                         </div>
                     </div>
@@ -1607,7 +1657,7 @@ export default function Page(props) {
                         <input 
                         className="ml-2" 
                         type={'checkbox'} 
-                        value={options.isLegendary} 
+                        checked={options.isLegendary} 
                         onChange={handleIsLegendary}/>
                     </div>
                     <div className="flex-col text-right">
@@ -1615,7 +1665,7 @@ export default function Page(props) {
                         <input 
                         className="ml-2" 
                         type={'checkbox'} 
-                        value={options.isMythic} 
+                        checked={options.isMythic} 
                         onChange={handleIsMythic}></input>
                     </div>
                     <div className="flex-col text-right">
@@ -1623,7 +1673,7 @@ export default function Page(props) {
                         <input
                         className="ml-2"
                         type={'checkbox'}
-                        value={options.hasLair}
+                        checked={options.hasLair}
                         onChange={handleHasLair} />
                     </div>
                     <div className="flex-col text-right">
@@ -1631,7 +1681,7 @@ export default function Page(props) {
                         <input 
                         className="ml-2" 
                         type={'checkbox'} 
-                        value={options.hasRegionEffects} 
+                        checked={options.hasRegionEffects} 
                         onChange={handleHasRegionalEffect}/>
                     </div>
                 </div>

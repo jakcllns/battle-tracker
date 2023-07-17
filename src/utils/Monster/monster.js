@@ -1,4 +1,182 @@
+export const ALIGNMENTS = [
+    'unaligned',
+    'lawful good',
+    'lawful neutral',
+    'lawful evil',
+    'neural good',
+    'true neutral',
+    'neutral evil',
+    'chaotic good',
+    'chaotic neutral',
+    'chaotic evil'
+]
 
+export const DAMAGE_TYPES = [
+    'acid',
+    'bludgeoning',
+    'cold',
+    'fire',
+    'force',
+    'lightning',
+    'necrotic',
+    'piercing',
+    'poison',
+    'psychic',
+    'radiant',
+    'slashing',
+    'thunder'
+]
+
+export const DAMAGE_RESISTANCES = [
+    'acid',
+    'cold',
+    'fire',
+    'force',
+    'lightning',
+    'necrotic',
+    'poison',
+    'psychic',
+    'radiant',
+    'thunder',
+    '(bludgeoning, piercing, and slashing from nonmagical sources)'
+]
+
+export const CONDITIONS = [
+    'blinded',
+    'charmed',
+    'deafened',
+    'frightened',
+    'grappled',
+    'incapacitated',
+    'invisible',
+    'paralyzed',
+    'petrified',
+    'poisoned',
+    'prone',
+    'restrained',
+    'stunned',
+    'unconscious'
+]
+
+export const SAVING_THROWS = [
+    'str',
+    'dex',
+    'con',
+    'int',
+    'wis',
+    'cha'
+]
+
+export const LANGUAGES = [
+    'common',
+    'dwarvish',
+    'elvish',
+    'giant',
+    'gnomish',
+    'goblin',
+    'hafling',
+    'orc',
+    'abyssal',
+    'celestial',
+    'draconic',
+    'deep speech',
+    'infernal',
+    'primordial',
+    'sylvan',
+    'undercommon'
+]
+
+export const SKILLS = [
+    {
+        skill: 'athletics',
+        ability: 'str'
+    },
+    {
+        skill: 'acrobatics',
+        ability: 'dex'
+    },
+    {
+        skill: 'sleight of hand',
+        ability: 'dex'
+    },
+    {
+        skill: 'stealth',
+        ability: 'dex'
+    },
+    {
+        skill: 'arcana',
+        ability: 'int'
+    },
+    {
+        skill: 'histroy',
+        ability: 'int'
+    },
+    {
+        skill: 'investigation',
+        ability: 'int'
+    },
+    {
+        skill: 'nature',
+        ability: 'int'
+    },
+    {
+        skill: 'religion',
+        ability: 'int'
+    },
+    {
+        skill: 'animal handling',
+        ability: 'wis'
+    },
+    {
+        skill: 'insight',
+        ability: 'wis'
+    },
+    {
+        skill: 'medicine',
+        ability: 'wis'
+    },
+    {
+        skill: 'perception',
+        ability: 'wis'
+    },
+    {
+        skill: 'survival',
+        ability: 'wis'
+    },
+    {
+        skill: 'deception',
+        ability: 'cha'
+    },
+    {
+        skill: 'intimidation',
+        ability: 'cha'
+    },
+    {
+        skill: 'performance',
+        ability: 'cha'
+    },
+    {
+        skill: 'persuasion',
+        ability: 'cha'
+    }
+]
+
+export const CREATURE_TYPES = [
+    'abberation',
+    'beast',
+    'celestial',
+    'construct',
+    'dragon',
+    'elemental',
+    'fey',
+    'fiend',
+    'giant',
+    'humanoid',
+    'monstrosity',
+    'ooze',
+    'plant',
+    'undead'
+]
 
 export const initializeMonster = () => {
     return (

@@ -2,3 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+.parchment {
+    background-image: url(../../public/statblockparch.jpg);
+    background-position: center;
+}
+
+.stat-bar {
+    background-image: url(../../public/statblockbar.jpg);
+    background-position: center;
+}
+
