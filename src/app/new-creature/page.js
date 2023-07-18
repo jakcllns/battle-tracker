@@ -54,18 +54,18 @@ export default function Page(props) {
 
     useEffect(()=> {
         
-        const updatedOptions = {...options}
-        updatedOptions.hasAbilities = monster.abilities.length > 0
-        updatedOptions.hasConditionImmunities = monster.conditionImmunities.length > 0
-        updatedOptions.hasDamageImmunities = monster.damageImmunities.length > 0
-        updatedOptions.hasDamageVulnerabilities = monster.damageVulnerabilites.length > 0
-        updatedOptions.hasRegionEffects = monster.regionalDescription !== ''
-        updatedOptions.hasResistance = monster.damageResistances.length > 0
-        updatedOptions.isLegendary = monster.legendaryDescription !== ''
-        updatedOptions.isMythic = monster.mythicDescription !== ''
-        updatedOptions.hasLair = monster.lairDescription !== ''
+        // const updatedOptions = {...options}
+        // updatedOptions.hasAbilities = monster.abilities.length > 0
+        // updatedOptions.hasConditionImmunities = monster.conditionImmunities.length > 0
+        // updatedOptions.hasDamageImmunities = monster.damageImmunities.length > 0
+        // updatedOptions.hasDamageVulnerabilities = monster.damageVulnerabilites.length > 0
+        // updatedOptions.hasRegionEffects = monster.regionalDescription !== ''
+        // updatedOptions.hasResistance = monster.damageResistances.length > 0
+        // updatedOptions.isLegendary = monster.legendaryDescription !== ''
+        // updatedOptions.isMythic = monster.mythicDescription !== ''
+        // updatedOptions.hasLair = monster.lairDescription !== ''
 
-        setOptions(updatedOptions)
+        // setOptions(updatedOptions)
 
         if(validHitDie === isDiceNotation(monster.hitDie)){return}
         setValidHitDie(isDiceNotation(monster.hitDie))
