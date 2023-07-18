@@ -1164,7 +1164,19 @@ export default function Page(props) {
                         </div>
 
                         {/* Overall Hits components */}
-                        <div className="flex-row">
+                        <div 
+                        onKeyDown= { e => {
+                                            
+                            if(e.ctrlKey && e.key === 'Enter') {
+                                e.preventDefault()
+                                if(action.name === '' || action.attackType === '' || action.reach === '' || action.hits.length === 0 ) { return e}
+                                setMonster({...monster, actions: [...monster.actions, action]})
+                                setAction(createAction('','Melee Weapon Attack',0,'',1,[],''))
+                                return e
+                            }
+                            return e
+                        }}
+                        className="flex-row">
                             <h3>Hits</h3>
                             <hr className="bg-slate-50" />
                             {/* Hits list */}
