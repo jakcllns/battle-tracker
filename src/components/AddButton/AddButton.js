@@ -6,6 +6,7 @@ const AddButton = ({onClick, disabled = false}) => {
         className="px-2"
         onClick={onClick}
         onKeyDown={e => e.key === 'Enter' ? onClick(e) : e}
+        tabIndex={-1}
         >+</button>
     )
 }

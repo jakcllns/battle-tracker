@@ -3,19 +3,20 @@ import AddButton from "@/components/AddButton/AddButton";
 import DeleteButton from "@/components/DeleteButton/DeleteButton";
 import ListBox from "@/components/ListBox/ListBox";
 import ListInput from "@/components/ListInput/ListInput";
+import Selector from "@/components/Selector/Selector";
+import StatBlock from "@/components/StatBlock/StatBlock";
 import SubmitButton from "@/components/SubmitButton/SubmitButton";
 import TextArea from "@/components/TextArea/TextArea";
 import { ChallengeRatings } from "@/utils/challengeRatingLookup";
 import { isDiceNotation, averageRoll } from "@/utils/DiceParser/DiceParser";
-import { createAbilities, createAction, createLegendaryAction, createSavingThrow, createSkill, initializeMonster, Tarrasque } from "@/utils/Monster/monster";
+import { ALIGNMENTS, CONDITIONS, createAbilities, createAction, createLegendaryAction, createSavingThrow, createSkill, CREATURE_TYPES, DAMAGE_TYPES, initializeMonster, LANGUAGES, SAVING_THROWS, SKILLS, Tarrasque } from "@/utils/Monster/monster";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Page(props) {
-    // const [monster, setMonster] = useState(initializeMonster);
-    const [monster, setMonster] = useState(Tarrasque);
+    const [monster, setMonster] = useState(initializeMonster);
+    // const [monster, setMonster] = useState(Tarrasque);
     const [validHitDie, setValidHitDie] = useState(false);
-    const [validMovement, setValidMovement] = useState(true);
     const [movementSpeed, setMovementSpeed] = useState('');
     const [validStats, setValidStats] = useState({
         str: true,
@@ -109,20 +110,17 @@ export default function Page(props) {
 
     const handleAddMovementSpeed = event => {
         event.preventDefault()
-        if(monster.movementSpeed.some(ele => ele === movementSpeed)) {
-            setValidMovement(false)
+        if(monster.movementSpeed.some(ele => ele === movementSpeed) || movementSpeed === '') {
             return
         }
-
         const newMonster = {...monster}
         newMonster.movementSpeed.push(movementSpeed)
         setMovementSpeed('')
         setMonster(newMonster)
     }
 
-    const handleRemoveMovementSpeed = (event, index) => {
-        event.preventDefault()
-        const newMonster = {...monster, movementSpeed: monster.movementSpeed.filter((ele, i) => i !== index)}
+    const handleRemoveMovementSpeed = (index) => {
+        const newMonster = {...monster, movementSpeed: monster.movementSpeed.filter((e,i) => i !== index)}
         setMonster(newMonster)
     }
 
@@ -139,6 +137,7 @@ export default function Page(props) {
 
     const handleAddSkill = (event) => {
         event.preventDefault()
+        if(skill.skillType === '' || skill.modifier === NaN || monster.skills.some(e => e.skillType === skill.skillType)) { return }
         const newMonster = {...monster}
         newMonster.skills.push({...skill})
         setSkill(createSkill('', 0))
@@ -296,6 +295,7 @@ export default function Page(props) {
         .then( res => res.json())
         .then( data => {
             console.log(data)
+            setMonster(initializeMonster())
         })
 
     }
@@ -311,7 +311,10 @@ export default function Page(props) {
                     <label>Damage Resistances:</label>
                 </div>
                 <div className="flex-row">
+                    
+                    
                     <ListInput
+                    items={DAMAGE_TYPES}
                     handleAdd={handleAddResistance}
                     type={'text'}
                     />
@@ -321,8 +324,8 @@ export default function Page(props) {
                     (
                         <ListBox
                         items={monster.damageResistances}
-                        handleDelete={items => {
-                            const newMonster = {...monster, damageResistances: items}
+                        handleDelete={index => {
+                            const newMonster = {...monster, damageResistances: monster.damageResistances.filter((e,i) => i !== index)}
                             setMonster(newMonster)
                         }}/>
                     ): undefined
@@ -341,6 +344,7 @@ export default function Page(props) {
                 </div>
                 <div className="flex-row">
                     <ListInput
+                    items={DAMAGE_TYPES}
                     handleAdd={handleAddDamageImmunity}
                     type={'text'}
                     />
@@ -349,8 +353,8 @@ export default function Page(props) {
                     monster.damageImmunities.length > 0 ?
                     (<ListBox
                     items={monster.damageImmunities}
-                    handleDelete={items => {
-                        const newMonster = {...monster, damageImmunities: items}
+                    handleDelete={index => {
+                        const newMonster = {...monster, damageImmunities: monster.damageImmunities.filter((e,i) => i !== index)}
                         setMonster(newMonster)
                     }}/>) : undefined
                 }
@@ -368,6 +372,7 @@ export default function Page(props) {
                 </div>
                 <div className="flex-row">
                     <ListInput
+                    items={DAMAGE_TYPES}
                     handleAdd={handleAddDamageVulnerability}
                     type={'text'}
                     />
@@ -377,8 +382,8 @@ export default function Page(props) {
                     (
                         <ListBox
                         items={monster.damageVulnerabilites}
-                        handleDelete={items => {
-                            const newMonster = {...monster, damageVulnerabilites: items}
+                        handleDelete={index => {
+                            const newMonster = {...monster, damageVulnerabilites: monster.damageVulnerabilites.filter((e,i) => i !== index)}
                             setMonster(newMonster)
                         }}
                         />
@@ -398,6 +403,7 @@ export default function Page(props) {
                 </div>
                 <div className="flex-row">
                     <ListInput
+                    items={CONDITIONS}
                     handleAdd={handleAddConditionImmunities}
                     type={'text'}
                     />
@@ -407,8 +413,8 @@ export default function Page(props) {
                     (
                         <ListBox
                         items={monster.conditionImmunities}
-                        handleDelete = {items => {
-                            const newMonster = {...monster, conditionImmunities: items}
+                        handleDelete = {index => {
+                            const newMonster = {...monster, conditionImmunities: monster.conditionImmunities.filter((e,i) => i !== index)}
                             setMonster(newMonster)
                         }}
                         />
@@ -779,256 +785,7 @@ export default function Page(props) {
                     
                     <hr className="bg-slate-50 h-1"/>
                     {/* Stat Block */}
-                    <div className="w-[1250px] flex bg-[#FDF1DC] parchment mx-auto flex-wrap text-red-900 text-left">
-                        <div className="w-full flex-row self-start">
-                            <hr className="bg-[#E69A28] stat-bar h-2"/>
-                        </div>
-
-                        <div className="px-2 flex-col w-[50%] flex flex-wrap">
-                            <div className="flex-row text-2xl">
-                                <h2 ><strong>{monster.name}</strong></h2>
-                            </div>
-                            <div className="flex-row">
-                                <h4><em>{`${monster.size} ${monster.race}, ${monster.alignment}`}</em></h4>
-                            </div>
-                            <div className="flex-row">
-                                <hr className="bg-red-700 h-[3px]" />
-                            </div>
-                            <div className="flex-row">
-                                <h4><strong>Armor Class</strong> {monster.armorClass} {monster.armorType !== '' ? `(${monster.armorType})`: ''}</h4>
-                            </div>
-                            <div>
-                                <h4><strong>Hit Points</strong> {`${monster.hitPoints} (${monster.hitDie})`}</h4>
-                            </div>
-                            <div className="flex-row">
-                                <h4><strong>Speed</strong> {monster.movementSpeed.join(', ')}</h4>
-                            </div>
-                            <div className="flex-row">
-                                <hr className="bg-red-700 h-[3px]"/>
-                            </div>
-                            <div className="flex-row flex w-full text-center">
-                                <div className="flex-col w-1/6">
-                                    <h4><strong>STR</strong></h4>
-                                    <h4>{monster.str} ({monster.str > 10 ? '+' : ''}{Math.floor((monster.str-10)/2)})</h4>
-                                </div>
-                                <div className="flex-col w-16">
-                                    <h4><strong>DEX</strong></h4>
-                                    <h4>{monster.dex} ({monster.dex > 10 ? '+' : ''}{Math.floor((monster.dex-10)/2)})</h4>
-                                </div>
-                                <div className="flex-col w-1/6">
-                                    <h4><strong>CON</strong></h4>
-                                    <h4>{monster.con} ({monster.con > 10 ? '+' : ''}{Math.floor((monster.con-10)/2)})</h4>
-                                </div>
-                                <div className="flex-col w-1/6">
-                                    <h4><strong>INT</strong></h4>
-                                    <h4>{monster.int} ({monster.int > 10 ? '+' : ''}{Math.floor((monster.int-10)/2)})</h4>
-                                </div>
-                                <div className="flex-col w-1/6">
-                                    <h4><strong>WIS</strong></h4>
-                                    <h4>{monster.wis} ({monster.wis > 10 ? '+' : ''}{Math.floor((monster.wis-10)/2)})</h4>
-                                </div>
-                                <div className="flex-col w-1/6">
-                                    <h4><strong>CHA</strong></h4>
-                                    <h4>{monster.cha} ({monster.cha > 10 ? '+' : ''}{Math.floor((monster.cha-10)/2)})</h4>
-                                </div>
-                            </div>
-                            <div className="flex-row">
-                                <hr className="bg-red-700 h-[3px]"/>
-                            </div>
-                            {
-                                monster.savingThrows.length > 0 ?
-                                <div className="flex-row">
-                                    <h4><strong>Saving Throws</strong> {monster.savingThrows.map(ele => `${ele.savingThrowType} ${ele.modifier > 0 ? "+" : ''} ${ele.modifier}`).join(", ")}</h4>
-                                </div>
-                                : undefined
-                            }
-
-                            {
-                                monster.skills.length > 0 ?
-                                <div className="flex-row">
-                                    <h4><strong>Skills</strong> {monster.skills.map(ele => `${ele.skillType} ${ele.modifier > 0 ? '+' : ''} ${ele.modifier}`).join(', ')}</h4>
-                                </div>
-                                : undefined
-                            }
-
-                            {
-                                monster.damageImmunities.length > 0 ?
-                                <div className="flex-row">
-                                    <h4><strong>Damage Immunities</strong> {monster.damageImmunities.join(', ')}</h4>
-                                </div>
-                                : undefined
-                            }
-
-                            {
-                                monster.conditionImmunities.length > 0 ?
-                                <div className="flex-row">
-                                    <h4><strong>Condition Immunities</strong> {monster.conditionImmunities.join(', ')}</h4>
-                                </div>
-                                : undefined
-                            }
-
-                            {
-                                monster.senses.length > 0 ?
-                                <div className="flex-row">
-                                    <h4><strong>Senses</strong> {monster.senses.join(', ')}</h4>
-                                </div>
-                                : undefined
-                            }
-
-                            {
-                                monster.languages.length > 0 ?
-                                <div className="flex-row">
-                                    <h4><strong>Languages</strong> {monster.languages.join(', ')}</h4>
-                                </div>
-                                : undefined
-                            }
-
-                            <div className="flex-row">
-                                <h4><strong>Challenge</strong> {monster.challenge} ({monster.experience.toLocaleString()} XP)</h4>
-                            </div>
-
-                            {
-                                monster.abilities.filter(ele => !ele.isAction).length > 0 ? (
-                                <>
-                                    <hr className="bg-red-700 h-[3px]"/>
-                                    <div className="flex-row flex flex-wrap">
-                                        {monster.abilities.filter(ele => !ele.isAction).map((ele, index) => {
-                                            return (
-                                                <div key={index} className="flex-row my-1">
-                                                    <p><strong>{ele.name}.</strong> {ele.description}</p>
-                                                </div>
-                                            )
-                                        })}
-                                    </div>
-                                </>):undefined
-                            }
-
-                            {
-                                monster.abilities.filter(ele => ele.isAction).length > 0 ? (
-                                    <>
-                                        <h3 className="text-2xl">Actions</h3>
-                                        <hr className="bg-red-700 h-[3px] mb-2" />
-                                        <div className="flex-row flex flex-wrap">
-                                            {monster.abilities.filter(ele => ele.isAction).map((ele, index) => {
-                                                return (
-                                                    <div key={index} className="flex-row my-1 whitespace-pre-line">
-                                                        <p><strong>{ele.name}.</strong> {ele.description}</p>
-                                                    </div>
-                                                )
-                                            })}
-                                        </div>
-                                    </>
-                                ): undefined
-                            }
-                            {/* work on adding skills, damage immunities, condition immunities, senses, languages, challenge */}
-                        </div>
-
-                        <div className="flex-col px-2 flex flex-wrap  w-[50%]">
-                            {
-                                monster.abilities.filter(ele => ele.isAction).length === 0 ?
-                                (<>
-                                    <h3 className="text-2xl">Actions</h3>
-                                    <hr className="bg-red-700 h-[3px] mb-2" />
-                                </>): undefined
-                            }
-                            <div className="flex-row flex flex-wrap">
-                                {monster.actions.map(({name, attackType, modifier, reach, targets, hits, description}, index) => {
-                                    return (
-                                        <div key={index} className="flex-row my-1 whitespace-pre-line">
-                                            <p>
-                                                <strong>{name}. </strong><em>{attackType}:</em> {modifier >= 0 ? '+' : ''}{modifier.toLocaleString()} to hit, reach {reach}, {targets} target{targets > 1 ? 's':''}. <em>Hit: </em> {hits.map(({dieType, damageType}) => `${averageRoll(dieType)} (${dieType}) ${damageType} damage`).join(' and ')}. {description}
-                                            </p>
-                                        </div>
-                                    )
-                                })}
-                            </div>
-                            
-                            {
-                                monster.legendaryDescription !== '' ? (
-                                    <>
-                                    <h3 className="text-2xl">Legendary Actions</h3>
-                                    <hr className="bg-red-700 h-[3px] mb-2" />
-                                    <div className="flex-row flex flex-wrap">
-                                        <div className="flex-row my-1, whitespace-pre-line">
-                                            <p>{monster.legendaryDescription}</p>
-                                        </div>
-                                        {monster.legendaryActions.map(({name, description}, index) => {
-                                            return (
-                                                <div key={index} className="flex-row my-1, whitespace-pre-line">
-                                                    <p><strong>{name}.</strong> {description}</p>
-                                                </div>
-                                            )
-                                        })}
-                                    </div>
-                                    </>
-                                ): undefined
-                            }
-                            {
-                                monster.lairDescription !== '' ? (
-                                    <>
-                                    <h3 className="text-2xl">Lair Actions</h3>
-                                    <hr className="bg-red-700 h-[3px] mb-2" />
-                                    <div className="flex-row flex flex-wrap">
-                                        <div className="flex-row my-1, whitespace-pre-line">
-                                            <p>{monster.lairDescription}</p>
-                                        </div>
-                                        {monster.lairActions.map(({name, description}, index) => {
-                                            return (
-                                                <div key={index} className="flex-row my-1, whitespace-pre-line">
-                                                    <p><strong>{name}.</strong> {description}</p>
-                                                </div>
-                                            )
-                                        })}
-                                    </div>
-                                    </>
-                                ): undefined
-                            }
-                            {
-                                monster.mythicDescription !== '' ? (
-                                    <>
-                                    <h3 className="text-2xl">Mythic Actions</h3>
-                                    <hr className="bg-red-700 h-[3px] mb-2" />
-                                    <div className="flex-row flex flex-wrap">
-                                        <div className="flex-row my-1, whitespace-pre-line">
-                                            <p>{monster.mythicDescription}</p>
-                                        </div>
-                                        {monster.mythicActions.map(({name, description}, index) => {
-                                            return (
-                                                <div key={index} className="flex-row my-1, whitespace-pre-line">
-                                                    <p><strong>{name}.</strong> {description}</p>
-                                                </div>
-                                            )
-                                        })}
-                                    </div>
-                                    </>
-                                ): undefined
-                            }
-                            {
-                                monster.regionalDescription !== '' ? (
-                                    <>
-                                    <h3 className="text-2xl">Regional Effects</h3>
-                                    <hr className="bg-red-700 h-[3px] mb-2" />
-                                    <div className="flex-row flex flex-wrap">
-                                        <div className="flex-row my-1, whitespace-pre-line">
-                                            <p>{monster.regionalDescription}</p>
-                                        </div>
-                                        {monster.regionalEffects.map(({name, description}, index) => {
-                                            return (
-                                                <div key={index} className="flex-row my-1, whitespace-pre-line">
-                                                    <p><strong>{name}.</strong> {description}</p>
-                                                </div>
-                                            )
-                                        })}
-                                    </div>
-                                    </>
-                                ): undefined
-                            }
-                        </div>
-                        
-                        <div className="w-full flex-row self-end">
-                            <hr className="bg-[#E69A28] stat-bar h-2"/>
-                        </div>
-                    </div>
+                    <StatBlock monster={monster} />
                     <hr className="bg-slate-50 h-1"/>
                 </div>
                 
@@ -1056,13 +813,18 @@ export default function Page(props) {
                     {/* Race */}
                     <div className="flex-col flex">
                         <label htmlFor="race">Race</label>
-                        <input className="text-slate-950" id="race" type="text" value={monster.race} onChange={handleGeneralChange}></input>
+                        <Selector items={CREATURE_TYPES} value={monster.race} onChange={handleGeneralChange} id="race" />
+                        {/* <input className="text-slate-950" id="race" type="text" value={monster.race} onChange={handleGeneralChange}></input> */}
                     </div>
 
                     {/* Alignment */}
                     <div className="flex-col flex">
                         <label htmlFor="alignment">Alignment</label>
-                        <input className="text-slate-950" id="alignment" type="text" value={monster.alignment} onChange={handleGeneralChange}></input>
+                        <Selector
+                        items={ALIGNMENTS}
+                        value={monster.alignment}
+                        id='alignment'
+                        onChange={handleGeneralChange}/>
                     </div>
 
                     {/* Armor Class */}
@@ -1100,36 +862,13 @@ export default function Page(props) {
                             value={movementSpeed} 
                             onChange={e=>setMovementSpeed(e.target.value)} 
                             onKeyDown={e => e.key === 'Enter' ? handleAddMovementSpeed(e) : e.key}></input>
-                            <button className="px-2" onClick={handleAddMovementSpeed}>+</button>
+                            <AddButton 
+                            onClick={handleAddMovementSpeed} 
+                            disabled={movementSpeed !== '' || monster.movementSpeed.some(e => e !== movementSpeed)} />
                         </div>
-                    </div>
-                    
-                    {/* Movement Speed */}
-                    <div className="flex-col max-h-24 content-center">
-                        <ul className="overflow-y-auto max-h-full">
-                            {
-                                monster.movementSpeed.map((ele, index) => {
-                                    return(
-                                        <li key={index}>
-                                            {ele} 
-                                            <button onClick={event => handleRemoveMovementSpeed(event, index)}>
-                                                <svg 
-                                                className="fill-slate-50 h-4 w-auto px-2"
-                                                viewBox="0 0 122.88 122.88" 
-                                                version="1.1" 
-                                                id="Layer_1" 
-                                                xmlns="http://www.w3.org/2000/svg" 
-                                                xmlnsXlink="http://www.w3.org/1999/xlink"  
-                                                xmlSpace="preserve">
-                                                    <g>
-                                                        <path fillRule="evenodd" clipRule="evenodd" d="M2.347,9.633h38.297V3.76c0-2.068,1.689-3.76,3.76-3.76h21.144 c2.07,0,3.76,1.691,3.76,3.76v5.874h37.83c1.293,0,2.347,1.057,2.347,2.349v11.514H0V11.982C0,10.69,1.055,9.633,2.347,9.633 L2.347,9.633z M8.69,29.605h92.921c1.937,0,3.696,1.599,3.521,3.524l-7.864,86.229c-0.174,1.926-1.59,3.521-3.523,3.521h-77.3 c-1.934,0-3.352-1.592-3.524-3.521L5.166,33.129C4.994,31.197,6.751,29.605,8.69,29.605L8.69,29.605z M69.077,42.998h9.866v65.314 h-9.866V42.998L69.077,42.998z M30.072,42.998h9.867v65.314h-9.867V42.998L30.072,42.998z M49.572,42.998h9.869v65.314h-9.869 V42.998L49.572,42.998z"/>
-                                                    </g>
-                                                </svg>
-                                            </button></li>
-                                    )
-                                })
-                            }
-                        </ul>
+                        <ListBox
+                        items={monster.movementSpeed}
+                        handleDelete={handleRemoveMovementSpeed}/>
                     </div>
                     
                     {/* Stats */}
@@ -1168,12 +907,10 @@ export default function Page(props) {
                     <div className="flex flex-col">    
                         <div className="flex-row py-2">
                             <label>Saving Throw Type:</label>
-                            <input 
-                            className="text-slate-950 mx-2 w-28 pl-2" 
-                            type={'text'} value={savingThrow.savingThrowType} 
-                            onChange={e => setSavingThrow({...savingThrow, savingThrowType: e.target.value})}
-                            onKeyDown={e => e.key === 'Enter' ? e.preventDefault() : e}
-                            ></input>
+                            <Selector 
+                            items={SAVING_THROWS.map(ele => ele.toLocaleUpperCase())} 
+                            value={savingThrow.savingThrowType}
+                            onChange={e => setSavingThrow({...savingThrow, savingThrowType: e.target.value})} />
                             <label>Modifier:</label>
                             <input 
                             className="text-slate-950 ml-2 w-12" 
@@ -1188,52 +925,24 @@ export default function Page(props) {
                                 disabled={savingThrow.savingThrowType === '' || isNaN(savingThrow.modifier) || savingThrow.modifier === 0}
                             >+</button>
                         </div>
-                        <div className="flex-row text-center overflow-y-auto max-h-14 ">
-                            <ul>
-                                {
-                                    monster.savingThrows.map((ele, index) => {
-                                        return (
-                                            <li key={index}>
-                                                {ele.savingThrowType} {ele.modifier > 0 ? '+' : ''}{ele.modifier}
-                                                <button 
-                                                    onClick={(e) => {
-                                                        e.preventDefault()
-                                                        const newMonster = {...monster, savingThrows: monster.savingThrows.filter((ele,i) => i !== index)}
-                                                        setMonster(newMonster)
-                                                    }}
-                                                >
-                                                    <svg 
-                                                    className="fill-slate-50 h-4 w-auto px-2"
-                                                    viewBox="0 0 122.88 122.88" 
-                                                    version="1.1" 
-                                                    id="Layer_1" 
-                                                    xmlns="http://www.w3.org/2000/svg" 
-                                                    xmlnsXlink="http://www.w3.org/1999/xlink"  
-                                                    xmlSpace="preserve">
-                                                        <g>
-                                                            <path fillRule="evenodd" clipRule="evenodd" d="M2.347,9.633h38.297V3.76c0-2.068,1.689-3.76,3.76-3.76h21.144 c2.07,0,3.76,1.691,3.76,3.76v5.874h37.83c1.293,0,2.347,1.057,2.347,2.349v11.514H0V11.982C0,10.69,1.055,9.633,2.347,9.633 L2.347,9.633z M8.69,29.605h92.921c1.937,0,3.696,1.599,3.521,3.524l-7.864,86.229c-0.174,1.926-1.59,3.521-3.523,3.521h-77.3 c-1.934,0-3.352-1.592-3.524-3.521L5.166,33.129C4.994,31.197,6.751,29.605,8.69,29.605L8.69,29.605z M69.077,42.998h9.866v65.314 h-9.866V42.998L69.077,42.998z M30.072,42.998h9.867v65.314h-9.867V42.998L30.072,42.998z M49.572,42.998h9.869v65.314h-9.869 V42.998L49.572,42.998z"/>
-                                                        </g>
-                                                    </svg>
-                                                </button>
-                                            </li>
-                                        )
-                                    })
-                                }
-                            </ul>
-                        </div>
+                        <ListBox
+                        items={monster.savingThrows.map((ele, index) => {
+                            return `${ele.savingThrowType} ${ele.modifier >= 0 ? '+' : ''}${ele.modifier}`
+                        })}
+                        handleDelete={index => {
+                            setMonster({...monster, savingThrows: monster.savingThrows.filter((e,i) => i !== index)})
+
+                        }}/>
                     </div>
                     
                     {/* Skills */}
                     <div className="flex flex-col">
                         <div className="flex-row py-2">
                             <label>Skill Type:</label>
-                            <input 
-                            className="text-slate-950 mx-2 w-28 pl-2"
-                            type={'text'}
+                            <Selector
+                            items={SKILLS.map(ele => ele.skill)}
                             value={skill.skillType}
-                            onChange={e => setSkill({...skill, skillType: e.target.value})}
-                            onKeyDown={ e => e.key === 'Enter' ? e.preventDefault() : e}
-                            ></input>
+                            onChange={e => setSkill({...skill, skillType: e.target.value})}/>
                             <label>Modifier:</label>
                             <input 
                             className="text-slate-950 ml-2 w-12"
@@ -1243,45 +952,17 @@ export default function Page(props) {
                             onChange={e => setSkill({...skill, modifier: e.target.value === ''? NaN : Number(e.target.value) })}
                             onKeyDown={e => e.key === 'Enter' ? handleAddSkill(e) : e}
                             ></input>
-                            <button
-                                className="px-2" 
-                                onClick={handleAddSkill}
-                                disabled={skill.skillType === '' || isNaN(skill.modifier) || skill.modifier === 0}
-                            >+</button>
+                            <AddButton
+                            onClick={handleAddSkill}
+                            disabled={skill.skillType === '' || isNaN(skill.modifier) || skill.modifier === 0}/>
+                            
                         </div>
-                        <div className="flex-row text-center overflow-y-auto max-h-14">
-                            <ul>
-                                {
-                                    monster.skills.map((ele, index) => {
-                                        return (
-                                            <li key={index}>
-                                                {ele.skillType} {ele.modifier >= 0 ? '+' : '-'}{ele.modifier}
-                                                <button 
-                                                    onClick={(e) => {
-                                                        e.preventDefault()
-                                                        const newMonster = {...monster, skills: monster.skills.filter((e,i) => i !== index)}
-                                                        setMonster(newMonster)
-                                                    }}
-                                                >
-                                                    <svg 
-                                                    className="fill-slate-50 h-4 w-auto px-2"
-                                                    viewBox="0 0 122.88 122.88" 
-                                                    version="1.1" 
-                                                    id="Layer_1" 
-                                                    xmlns="http://www.w3.org/2000/svg" 
-                                                    xmlnsXlink="http://www.w3.org/1999/xlink"  
-                                                    xmlSpace="preserve">
-                                                        <g>
-                                                            <path fillRule="evenodd" clipRule="evenodd" d="M2.347,9.633h38.297V3.76c0-2.068,1.689-3.76,3.76-3.76h21.144 c2.07,0,3.76,1.691,3.76,3.76v5.874h37.83c1.293,0,2.347,1.057,2.347,2.349v11.514H0V11.982C0,10.69,1.055,9.633,2.347,9.633 L2.347,9.633z M8.69,29.605h92.921c1.937,0,3.696,1.599,3.521,3.524l-7.864,86.229c-0.174,1.926-1.59,3.521-3.523,3.521h-77.3 c-1.934,0-3.352-1.592-3.524-3.521L5.166,33.129C4.994,31.197,6.751,29.605,8.69,29.605L8.69,29.605z M69.077,42.998h9.866v65.314 h-9.866V42.998L69.077,42.998z M30.072,42.998h9.867v65.314h-9.867V42.998L30.072,42.998z M49.572,42.998h9.869v65.314h-9.869 V42.998L49.572,42.998z"/>
-                                                        </g>
-                                                    </svg>
-                                                </button>
-                                            </li>
-                                        )
-                                    })
-                                }
-                            </ul>
-                        </div>
+                        <ListBox
+                        handleDelete={index => {
+                            setMonster({...monster, skills: monster.skills.filter((e,i) => i !== index)})
+                        }}
+                        items={monster.skills.map(ele => `${ele.skillType} ${ele.modifier >= 0 ? '+' : '-'}${ele.modifier}`)}
+                        />
                     </div>
                     
                     {/* Senses */}
@@ -1302,105 +983,42 @@ export default function Page(props) {
                             >+</button>
                         </div>
                         {/* Senses List */}
-                        <div className="flex-row overflow-y-auto">
-                            <ul>
-                                {
-                                    monster.senses.map((ele) => {
-                                        return (
-                                            <li key={ele}>
-                                                {ele} 
-                                                <button 
-                                                onClick={(e) => {
-                                                    e.preventDefault()
-                                                    const newMonster = {...monster, senses: monster.senses.filter((el) => el !== ele)}
-                                                    setMonster(newMonster)
-                                                }}
-                                                >
-                                                    <svg 
-                                                    className="fill-slate-50 h-4 w-auto px-2"
-                                                    viewBox="0 0 122.88 122.88" 
-                                                    version="1.1" 
-                                                    id="Layer_1" 
-                                                    xmlns="http://www.w3.org/2000/svg" 
-                                                    xmlnsXlink="http://www.w3.org/1999/xlink"  
-                                                    xmlSpace="preserve">
-                                                        <g>
-                                                            <path fillRule="evenodd" clipRule="evenodd" d="M2.347,9.633h38.297V3.76c0-2.068,1.689-3.76,3.76-3.76h21.144 c2.07,0,3.76,1.691,3.76,3.76v5.874h37.83c1.293,0,2.347,1.057,2.347,2.349v11.514H0V11.982C0,10.69,1.055,9.633,2.347,9.633 L2.347,9.633z M8.69,29.605h92.921c1.937,0,3.696,1.599,3.521,3.524l-7.864,86.229c-0.174,1.926-1.59,3.521-3.523,3.521h-77.3 c-1.934,0-3.352-1.592-3.524-3.521L5.166,33.129C4.994,31.197,6.751,29.605,8.69,29.605L8.69,29.605z M69.077,42.998h9.866v65.314 h-9.866V42.998L69.077,42.998z M30.072,42.998h9.867v65.314h-9.867V42.998L30.072,42.998z M49.572,42.998h9.869v65.314h-9.869 V42.998L49.572,42.998z"/>
-                                                        </g>
-                                                    </svg>
-                                                </button>
-                                            </li>
-                                        )
-                                    })
-                                }
-                            </ul>
-                        </div>
+                        <ListBox
+                        items={monster.senses}
+                        handleDelete={index => {
+                            setMonster({...monster, senses: monster.senses.filter((e,i) => i !== index)})
+                        }} />
                     </div>
 
                     <div className="flex flex-col max-h-36">
                         <div className="flex-row py-2">
-                            <label>Languages</label>
-                            <input
-                            className="text-slate-950 mx-2 w-52 pl-2"
-                            type={'text'}
+                            <label className="mr-1">Languages</label>
+                            <Selector
+                            items={LANGUAGES}
                             value={language}
                             onChange={e => setLanguage(e.target.value)}
-                            onKeyDown={e => e.key === "Enter" ? handleAddLanguage(e) : e.key}
-                            ></input>
-                            <button
-                            className="px-2"
+                            onKeyDown={e =>  e.key === 'Enter' ? handleAddLanguage(e) : e.key}/>
+                            <AddButton
                             onClick={handleAddLanguage}
-                            disabled={language === '' || monster.languages.some(ele => ele === language)}
-                            >+</button>
+                            disabled={language === '' || monster.languages.some(ele => ele === language)}/>
+                            
                         </div>
-                        {/* Language List */}
-                        <div className="flex-row overflow-y-auto">
-                            <ul>
-                                {
-                                    monster.languages.map((ele) => {
-                                        return (
-                                            <li key={ele}>
-                                                {ele} 
-                                                <button 
-                                                onClick={(e) => {
-                                                    e.preventDefault()
-                                                    const newMonster = {...monster, languages: monster.languages.filter((el) => el !== ele)}
-                                                    setMonster(newMonster)
-                                                }}
-                                                >
-                                                    <svg 
-                                                    className="fill-slate-50 h-4 w-auto px-2"
-                                                    viewBox="0 0 122.88 122.88" 
-                                                    version="1.1" 
-                                                    id="Layer_1" 
-                                                    xmlns="http://www.w3.org/2000/svg" 
-                                                    xmlnsXlink="http://www.w3.org/1999/xlink"  
-                                                    xmlSpace="preserve">
-                                                        <g>
-                                                            <path fillRule="evenodd" clipRule="evenodd" d="M2.347,9.633h38.297V3.76c0-2.068,1.689-3.76,3.76-3.76h21.144 c2.07,0,3.76,1.691,3.76,3.76v5.874h37.83c1.293,0,2.347,1.057,2.347,2.349v11.514H0V11.982C0,10.69,1.055,9.633,2.347,9.633 L2.347,9.633z M8.69,29.605h92.921c1.937,0,3.696,1.599,3.521,3.524l-7.864,86.229c-0.174,1.926-1.59,3.521-3.523,3.521h-77.3 c-1.934,0-3.352-1.592-3.524-3.521L5.166,33.129C4.994,31.197,6.751,29.605,8.69,29.605L8.69,29.605z M69.077,42.998h9.866v65.314 h-9.866V42.998L69.077,42.998z M30.072,42.998h9.867v65.314h-9.867V42.998L30.072,42.998z M49.572,42.998h9.869v65.314h-9.869 V42.998L49.572,42.998z"/>
-                                                        </g>
-                                                    </svg>
-                                                </button>
-                                            </li>
-                                        )
-                                    })
-                                }
-                            </ul>
-                        </div>
+                        <ListBox
+                        items={monster.languages}
+                        handleDelete={index => {
+                            setMonster({...monster, languages: monster.languages.filter((e,i) => i !== index)})
+                        }}/>
+                        
                     </div>
 
                     {/* Challenge /  Experience */}
                     <div className="flex flex-col">
                         <div className="flex-row py-2">
                             <label>Challenge</label>
-                            <select
-                            className="text-slate-950 mx-2 w-fit pl-2"
-                            type={'text'}
+                            <Selector
+                            items={Object.keys(ChallengeRatings)}
                             value={monster.challenge}
-                            onChange={handleChallengeChange}
-                            >
-                                {Object.keys(ChallengeRatings).map(ele => <option key={ele}>{ele}</option>)}
-                            </select>
+                            onChange={handleChallengeChange}/>
                             <label>{monster.experience.toLocaleString()} XP</label>
                         </div>
                     </div>
@@ -1556,22 +1174,9 @@ export default function Page(props) {
                                         action.hits.map((ele, index) => {
                                             return (
                                                 <li key={index}>
+                                                    <DeleteButton
+                                                    onClick={e => setAction({...action, hits: action.hits.filter((e, i) => i !== index)})} />
                                                     {ele.dieType} {ele.damageType}
-                                                    <button
-                                                    onClick={e => setAction({...action, hits: action.hits.filter((e, i) => i !== index)})}>
-                                                        <svg 
-                                                        className="fill-slate-50 h-4 w-auto px-2"
-                                                        viewBox="0 0 122.88 122.88" 
-                                                        version="1.1" 
-                                                        id="Layer_1" 
-                                                        xmlns="http://www.w3.org/2000/svg" 
-                                                        xmlnsXlink="http://www.w3.org/1999/xlink"  
-                                                        xmlSpace="preserve">
-                                                            <g>
-                                                                <path fillRule="evenodd" clipRule="evenodd" d="M2.347,9.633h38.297V3.76c0-2.068,1.689-3.76,3.76-3.76h21.144 c2.07,0,3.76,1.691,3.76,3.76v5.874h37.83c1.293,0,2.347,1.057,2.347,2.349v11.514H0V11.982C0,10.69,1.055,9.633,2.347,9.633 L2.347,9.633z M8.69,29.605h92.921c1.937,0,3.696,1.599,3.521,3.524l-7.864,86.229c-0.174,1.926-1.59,3.521-3.523,3.521h-77.3 c-1.934,0-3.352-1.592-3.524-3.521L5.166,33.129C4.994,31.197,6.751,29.605,8.69,29.605L8.69,29.605z M69.077,42.998h9.866v65.314 h-9.866V42.998L69.077,42.998z M30.072,42.998h9.867v65.314h-9.867V42.998L30.072,42.998z M49.572,42.998h9.869v65.314h-9.869 V42.998L49.572,42.998z"/>
-                                                            </g>
-                                                        </svg>
-                                                    </button>
                                                 </li>
                                             )
                                         })
@@ -1593,14 +1198,11 @@ export default function Page(props) {
                                 </div>
                                 <div className="flex-row my-1">
                                     <label htmlFor="damageType">Damage Type:</label>
-                                    <input
-                                    id="damageType"
-                                    className="text-slate-950 mx-1"
-                                    type={'text'}
+                                    <Selector
+                                    items={DAMAGE_TYPES}
                                     value={hit.damageType}
                                     onChange={e => setHit({...hit, damageType: e.target.value})}
-                                    onKeyDown={e => e.key === 'Enter' ? handleAddHit(e) : e}
-                                    ></input>
+                                    onKeyDown={e => e.key === 'Enter' ? handleAddHit(e) : e} />
                                     <AddButton 
                                     disabled={hit.damageType === '' || hit.dieType === '' || !isDiceNotation(hit.dieType)}
                                     onClick={handleAddHit}
@@ -1704,8 +1306,4 @@ export default function Page(props) {
         </div>
     )
 }
-
-// Work on finishing legendary actions
-// Add legendary description textarea
-// Move abilities section above Actions
-// Move Resistances, Immunities, and Vulnerabilities section to below Senses scection
+//  Left off at adding in Baboon from SRD on page 367 Monsters start on page 261 of SRD

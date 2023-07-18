@@ -1,6 +1,6 @@
 'use client'
 import AddCreature from "@/components/AddCreature/AddCreature";
-import Statblock from "@/components/Statblock/Statblock";
+import StatCard from "@/components/StatCard/StatCard";
 import Dice from "@/utils/DiceParser/DiceParser";
 import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
@@ -73,7 +73,7 @@ export default function Page(props){
        return creatures.length > 0 ? creatures.map(
             (creature, index) => {
                 return (
-                    <Statblock
+                    <StatCard
                         key={index}
                         creature={creature}
                         index={index}

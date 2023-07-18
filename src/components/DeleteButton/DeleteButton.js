@@ -1,6 +1,6 @@
-const DeleteButton = props => {
+const DeleteButton = ({onClick}) => {
     return (
-        <button onClick={props.onClick}>
+        <button onClick={onClick} tabIndex={-1}>
             <svg 
             className="fill-slate-50 h-4 w-auto px-2"
             viewBox="0 0 122.88 122.88" 
