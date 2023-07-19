@@ -50,7 +50,7 @@ const CreaturForm = ({monster, setMonster, mode}) => {
     const [mythicAction, setMythicAction] = useState({name: '', description: ''})
     const [lairAction, setLairAction] = useState({name: '', description: ''})
 
-    useEffect(() => console.log(action), [action])
+    // useEffect(() => console.log(action), [action])
 
     useEffect(()=> {
         
@@ -286,7 +286,7 @@ const CreaturForm = ({monster, setMonster, mode}) => {
 
     const handleCreateCreature = event => {
         event.preventDefault()
-        console.log(JSON.stringify({...monster, id_name: monster.name.toLowerCase().replace(/\s/g, '_')}))
+        // console.log(JSON.stringify({...monster, id_name: monster.name.toLowerCase().replace(/\s/g, '_')}))
 
         fetch('api/new-monsters', {
             method: 'POST',

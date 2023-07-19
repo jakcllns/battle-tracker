@@ -178,13 +178,13 @@ const StatBlock = ({monster}) => {
                                 <div className="flex-row my-1, whitespace-pre-line text-black">
                                     <p>{monster.legendaryDescription}</p>
                                 </div>
+                                <div className="flex-row my-1, whitespace-pre-line text-black">
                                 {monster.legendaryActions.map(({name, description}, index) => {
                                     return (
-                                        <div key={index} className="flex-row my-1, whitespace-pre-line text-black">
-                                            <p><strong>{name}.</strong> {description}</p>
-                                        </div>
+                                        <p key={index}><strong>{name}.</strong> {description}</p>
                                     )
                                 })}
+                                </div>
                             </div>
                             </>
                         ): undefined
@@ -198,13 +198,13 @@ const StatBlock = ({monster}) => {
                                 <div className="flex-row my-1, whitespace-pre-line text-black">
                                     <p>{monster.lairDescription}</p>
                                 </div>
+                                <div className="flex-row my-1, whitespace-pre-line text-black">
                                 {monster.lairActions.map(({name, description}, index) => {
                                     return (
-                                        <div key={index} className="flex-row my-1, whitespace-pre-line text-black">
-                                            <p><strong>{name}.</strong> {description}</p>
-                                        </div>
+                                        <p key={index}><strong>{name}.</strong> {description}</p>
                                     )
                                 })}
+                                </div>
                             </div>
                             </>
                         ): undefined
@@ -218,13 +218,13 @@ const StatBlock = ({monster}) => {
                                 <div className="flex-row my-1, whitespace-pre-line text-black">
                                     <p>{monster.mythicDescription}</p>
                                 </div>
+                                <div className="flex-row my-1, whitespace-pre-line text-black">
                                 {monster.mythicActions.map(({name, description}, index) => {
                                     return (
-                                        <div key={index} className="flex-row my-1, whitespace-pre-line text-black">
-                                            <p><strong>{name}.</strong> {description}</p>
-                                        </div>
+                                        <p key={index}><strong>{name}.</strong> {description}</p>
                                     )
                                 })}
+                                </div>
                             </div>
                             </>
                         ): undefined
@@ -238,13 +238,13 @@ const StatBlock = ({monster}) => {
                                 <div className="flex-row my-1, whitespace-pre-line text-black">
                                     <p>{monster.regionalDescription}</p>
                                 </div>
+                                <div className="flex-row my-1, whitespace-pre-line text-black">
                                 {monster.regionalEffects.map(({name, description}, index) => {
                                     return (
-                                        <div key={index} className="flex-row my-1, whitespace-pre-line text-black">
-                                            <p><strong>{name}.</strong> {description}</p>
-                                        </div>
+                                        <p key={index}><strong>{name}.</strong> {description}</p>
                                     )
                                 })}
+                                </div>
                             </div>
                             </>
                         ): undefined

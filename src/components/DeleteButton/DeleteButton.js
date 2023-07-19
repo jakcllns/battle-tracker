@@ -1,8 +1,8 @@
-const DeleteButton = ({onClick}) => {
+const DeleteButton = ({onClick, className = "fill-slate-50 h-4 w-auto px-2"}) => {
     return (
-        <button onClick={onClick} tabIndex={-1}>
+        <button onClick={onClick} tabIndex={-1} >
             <svg 
-            className="fill-slate-50 h-4 w-auto px-2"
+            className={className}
             viewBox="0 0 122.88 122.88" 
             version="1.1" 
             id="Layer_1" 

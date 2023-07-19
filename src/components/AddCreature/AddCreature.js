@@ -5,14 +5,15 @@ import Search from "../search/search"
 
 const GetNewCreature = () => {
     return {
-        Name: '',
-        ArmorClass:  10,
-        HitDie: '',
-        DEX: 10,
+        name: '',
+        armorClass:  10,
+        hitDie: '',
+        dex: 10,
         id_name: '',
         multiply: 1,
         initiative: '1d20',
-        HitPoints: 0
+        hitPoints: 0,
+        id_name: ''
     }
 }
 
@@ -21,17 +22,17 @@ const createInitiativeDiceNotation = dex => {
     return `1d20${modifier > 0 ? `+${modifier}`: modifier < 0 ? `${modifier}`: ''}`
 }
 
-const AddCreature = props => {
+const AddCreature = ({data, handleCreatureSubmit}) => {
     const [searchValue, setSearchValue] = useState('')
     const [searchedCreature, setSearchedCreature] = useState(GetNewCreature())
 
     const handleSetSearchedCreature = creature => {
         if(!creature){
-            const currentCreature = {...GetNewCreature(), Name: searchValue, multiply: searchedCreature.multiply, initiative: createInitiativeDiceNotation()}
+            const currentCreature = {...GetNewCreature(), name: searchValue, multiply: searchedCreature.multiply, initiative: createInitiativeDiceNotation()}
             setSearchedCreature(currentCreature)
             return
         }
-        setSearchedCreature({...creature, multiply: searchedCreature.multiply, initiative: createInitiativeDiceNotation(creature.DEX)})
+        setSearchedCreature({...creature, multiply: searchedCreature.multiply, initiative: createInitiativeDiceNotation(creature.dex)})
         
     }
 
@@ -49,17 +50,17 @@ const AddCreature = props => {
         const val = event.target.value
 
         if(Number(val) && Number.isInteger(Number(val))) {
-            setSearchedCreature({...searchedCreature, HitPoints: Number(val), HitDie: undefined})
+            setSearchedCreature({...searchedCreature, hitPoints: Number(val), hitDie: undefined})
             return
         }
 
-        setSearchedCreature({...searchedCreature, HitPoints: 0, HitDie: val})
+        setSearchedCreature({...searchedCreature, hitPoints: 0, hitDie: val})
 
     }
 
     const handleArmorClassChange = event => {
         const armorClass = Number(event.target.value)
-        setSearchedCreature({...searchedCreature, ArmorClass: armorClass === 0 ? undefined : armorClass})
+        setSearchedCreature({...searchedCreature, armorClass: armorClass === 0 ? undefined : armorClass})
     }
 
     const handleMultiplyChange = event => {
@@ -75,7 +76,7 @@ const AddCreature = props => {
                     searchedCreature={searchedCreature}
                     setSearchValue={setSearchValue}
                     setSearchedCreature={handleSetSearchedCreature}
-                    data={props.data}
+                    data={data}
                     
                 />
                 {/* <div className="flex flex-col gap-y-2">
@@ -107,13 +108,13 @@ const AddCreature = props => {
                     <input 
                         type="text" 
                         className="rounded-sm text-slate-950 w-24" 
-                        value={searchedCreature.HitDie ? searchedCreature.HitDie : searchedCreature.HitPoints === 0 ? '' : searchedCreature.HitPoints} 
+                        value={searchedCreature.hitDie ? searchedCreature.hitDie : searchedCreature.hitPoints === 0 ? '' : searchedCreature.hitPoints} 
                         onChange={handleHitPointChange}
                     />
                 </div>
                 <div className="flex flex-col gap-y-2">
                     <label>Armor Class</label>
-                    <input type="number" min={1} className="rounded-sm text-slate-950 w-10 mx-auto" value={searchedCreature.ArmorClass} onChange={handleArmorClassChange} />
+                    <input type="number" min={1} className="rounded-sm text-slate-950 w-10 mx-auto" value={searchedCreature.armorClass} onChange={handleArmorClassChange} />
                 </div>
                 <div className="flex flex-col gap-y-2">
                     <label>Multiply</label>
@@ -123,7 +124,7 @@ const AddCreature = props => {
                             className="mx-3 px-2 text-lg font-bold  rounded border-2 border-white hover:bg-slate-600 w-10" 
                             onClick={() =>{
                                 setSearchedCreature(GetNewCreature())
-                                props.handleCreatureSubmit(searchedCreature)
+                                handleCreatureSubmit(searchedCreature)
                             }}
                         >+</button>
                     </div>
