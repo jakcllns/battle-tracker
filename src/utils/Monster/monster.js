@@ -355,9 +355,9 @@ export const createAction = (actionName, attackType, modifier, reach, targets, h
 }
 
 export const getModifier =  stat => {
-    if(typeof stat !== 'number') {
-        const error = new Error('argument provided is not a number')
-        throw error
+    const val = Number(stat)
+    if(!val) {
+        return 0
     }
     return Math.floor((stat-10)/2)
 }
