@@ -34,7 +34,7 @@ export default function RootLayout({ children }) {
             {
               paths.map(({path, name},i) => {
                 return (
-                  <li key={i} className={`lg:block lg:mx-0 sm:inline sm:mx-1 ${path === pathName ? 'underline': ''}`}><Link href={path}>{name}</Link></li>
+                  <li disabled={path === pathName} key={i} className={`font-bold lg:block lg:mx-0 sm:inline sm:mx-1 ${path === pathName ? 'underline text-gray-500': ''}`}><Link href={path}>{name}</Link></li>
                 )
               })
             }
