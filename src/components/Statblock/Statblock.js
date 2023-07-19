@@ -1,5 +1,6 @@
 import { ChallengeRatings } from "@/utils/challengeRatingLookup"
 import { averageRoll } from "@/utils/DiceParser/DiceParser"
+import { getModifier } from "@/utils/Monster/monster"
 
 const StatBlock = ({monster}) => {
     return (
@@ -33,27 +34,27 @@ const StatBlock = ({monster}) => {
                             <div className="flex-row flex w-full text-center">
                                 <div className="flex-col w-1/6">
                                     <h4><strong>STR</strong></h4>
-                                    <h4>{monster.str} ({monster.str > 10 ? '+' : ''}{Math.floor((monster.str-10)/2)})</h4>
+                                    <h4>{monster.str} ({monster.str > 10 ? '+' : ''}{getModifier(monster.str)})</h4>
                                 </div>
                                 <div className="flex-col w-16">
                                     <h4><strong>DEX</strong></h4>
-                                    <h4>{monster.dex} ({monster.dex > 10 ? '+' : ''}{Math.floor((monster.dex-10)/2)})</h4>
+                                    <h4>{monster.dex} ({monster.dex > 10 ? '+' : ''}{getModifier(monster.dex)})</h4>
                                 </div>
                                 <div className="flex-col w-1/6">
                                     <h4><strong>CON</strong></h4>
-                                    <h4>{monster.con} ({monster.con > 10 ? '+' : ''}{Math.floor((monster.con-10)/2)})</h4>
+                                    <h4>{monster.con} ({monster.con > 10 ? '+' : ''}{getModifier(monster.con)})</h4>
                                 </div>
                                 <div className="flex-col w-1/6">
                                     <h4><strong>INT</strong></h4>
-                                    <h4>{monster.int} ({monster.int > 10 ? '+' : ''}{Math.floor((monster.int-10)/2)})</h4>
+                                    <h4>{monster.int} ({monster.int > 10 ? '+' : ''}{getModifier(monster.int)})</h4>
                                 </div>
                                 <div className="flex-col w-1/6">
                                     <h4><strong>WIS</strong></h4>
-                                    <h4>{monster.wis} ({monster.wis > 10 ? '+' : ''}{Math.floor((monster.wis-10)/2)})</h4>
+                                    <h4>{monster.wis} ({monster.wis > 10 ? '+' : ''}{getModifier(monster.wis)})</h4>
                                 </div>
                                 <div className="flex-col w-1/6">
                                     <h4><strong>CHA</strong></h4>
-                                    <h4>{monster.cha} ({monster.cha > 10 ? '+' : ''}{Math.floor((monster.cha-10)/2)})</h4>
+                                    <h4>{monster.cha} ({monster.cha > 10 ? '+' : ''}{getModifier(monster.cha)})</h4>
                                 </div>
                             </div>
                             <div className="flex-row">

@@ -9,13 +9,25 @@ import SubmitButton from "@/components/SubmitButton/SubmitButton";
 import TextArea from "@/components/TextArea/TextArea";
 import { ChallengeRatings } from "@/utils/challengeRatingLookup";
 import { isDiceNotation, averageRoll } from "@/utils/DiceParser/DiceParser";
-import { ALIGNMENTS, CONDITIONS, createAbilities, createAction, createLegendaryAction, createSavingThrow, createSkill, CREATURE_TYPES, DAMAGE_TYPES, initializeMonster, LANGUAGES, SAVING_THROWS, SKILLS, Tarrasque } from "@/utils/Monster/monster";
+import { ALIGNMENTS, CONDITIONS, createAbilities, createAction, createLegendaryAction, createSavingThrow, createSkill, CREATURE_TYPES, DAMAGE_TYPES, initializeMonster, LANGUAGES, SAVING_THROWS, SKILLS } from "@/utils/Monster/monster";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+const refreshOptions = () => {
+    return {
+        hasResistance: false,
+        hasDamageImmunities: false,
+        hasDamageVulnerabilities: false,
+        hasConditionImmunities: false,
+        hasAbilities: false,
+        hasRegionEffects: false,
+        isLegendary: false,
+        isMythic: false,
+        hasLair: false
+    }
+}
 export default function Page(props) {
     const [monster, setMonster] = useState(initializeMonster);
-    // const [monster, setMonster] = useState(Tarrasque);
     const [validHitDie, setValidHitDie] = useState(false);
     const [movementSpeed, setMovementSpeed] = useState('');
     const [validStats, setValidStats] = useState({
@@ -26,17 +38,7 @@ export default function Page(props) {
         wis: true,
         cha: true
     })
-    const [options, setOptions] = useState({
-        hasResistance: false,
-        hasDamageImmunities: false,
-        hasDamageVulnerabilities: false,
-        hasConditionImmunities: false,
-        hasAbilities: false,
-        hasRegionEffects: false,
-        isLegendary: false,
-        isMythic: false,
-        hasLair: false
-    })
+    const [options, setOptions] = useState(refreshOptions())
 
     const [savingThrow, setSavingThrow] = useState(createSavingThrow('', 0))
     const [skill, setSkill] = useState(createSkill('', 0))
@@ -296,6 +298,7 @@ export default function Page(props) {
         .then( data => {
             console.log(data)
             setMonster(initializeMonster())
+            setOptions(refreshOptions())
         })
 
     }
@@ -1081,7 +1084,8 @@ export default function Page(props) {
                             className="ml-2" 
                             type={'checkbox'} 
                             checked={options.hasAbilities} 
-                            onChange={e => handleOptionChange(e.target.checked, 'hasAbilities', 'abilities')}/>
+                            onChange={e => handleOptionChange(e.target.checked, 'hasAbilities', 'abilities')}
+                            onKeyDown={e => e.key === 'Enter' ? handleOptionChange(!e.target.checked, 'hasAbilities', 'abilities') : e}/>
                         </div>
                     </div>
                     <div className="flex-col flex w-full ">
@@ -1255,15 +1259,6 @@ export default function Page(props) {
                         </div>
                     </div>
                 </div>
-                
-                {/* Optionals */}
-                {/* Lets have this section create new sections above when checked */}
-                {/* Need to refactor to take some of the copied code and convert into reusable component */}
-                {/* 
-                    May need to clean up some of the states that are being stored and even move them to their child components 
-                    as code is refactored to help reduce the amount of copied code. This will make it easier to update the UI
-                    as it progresses
-                */}
                 
                 <div className="flex-row flex gap-2 flex-wrap w-full">
                     <div className="flex-col text-right">
