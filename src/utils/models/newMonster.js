@@ -80,7 +80,7 @@ export const NewMonsterSchema = new Schema({
     damageImmunities: [{
         type: String
     }],
-    damageVulnerablities: [{
+    damageVulnerabilities: [{
         type: String
     }],
     conditionImmunities: [{
