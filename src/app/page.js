@@ -106,7 +106,7 @@ export default function Page(props){
                 <div className="bg-slate-950 opacity-20 w-[100vw] h-[100vh] z-0 top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 absolute" onClick={() => setCreature(undefined)}>
                     
                 </div>
-                <div className="opacity-100 z-10 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-h-screen max-w-[100vw] overflow-auto text-xs">
+                <div className="opacity-100 z-10 fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 sm:max-h-[50vh] lg:max-h-[100vh] max-w-[100vw] overflow-auto text-xs">
                     <button 
                     className="fixed left-[100%] -translate-x-[17px] font-bold  px-1 rounded-b bg-gray-400 "
                     onClick={e => {

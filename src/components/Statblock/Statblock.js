@@ -9,7 +9,7 @@ const StatBlock = ({monster}) => {
                     <hr className="bg-[#E69A28] stat-bar h-2"/>
                 </div>
 
-                <div className="px-2 w-[50%] flex flex-wrap flex-col">
+                <div className="px-2 lg:w-[50%] sm:w-full flex flex-wrap flex-col">
                     <div className="flex-row text-2xl">
                         <h2 ><strong>{monster.name}</strong></h2>
                     </div>
@@ -149,7 +149,7 @@ const StatBlock = ({monster}) => {
                     {/* work on adding skills, damage immunities, condition immunities, senses, languages, challenge */}
                 </div>
 
-                <div className="px-2 flex flex-wrap  w-[50%] flex-col">
+                <div className="px-2 flex flex-wrap  lg:w-[50%] sm:w-full flex-col">
                     {
                         monster.abilities.filter(ele => ele.isAction).length === 0 ?
                         (<>

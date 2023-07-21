@@ -6,7 +6,6 @@ export async function ConnectToDb() {
     const connectionString = process.env.DB_CONNECTION_STRING
     mongoose.set('strictQuery', true)
 
-    console.log(connectionString)
 
     if(isConnected){
         console.log('MongoDb is already connected');
@@ -14,12 +13,14 @@ export async function ConnectToDb() {
     }
 
     try {
-        await mongoose.connect(
+        const db = await mongoose.connect(
             connectionString,
             {
                 dbName: 'dnd-monsters'
             }
         )
+
+        console.log(`Connections ${db.connections.length}`)
 
         isConnected = true
 

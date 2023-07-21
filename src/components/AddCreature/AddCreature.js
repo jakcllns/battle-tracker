@@ -79,21 +79,6 @@ const AddCreature = ({data, handleCreatureSubmit}) => {
                     data={data}
                     
                 />
-                {/* <div className="flex flex-col gap-y-2">
-                    <label>Creature Name</label>
-                    <div className="w-fit">
-                        <input type="text" value={searchValue} onChange={onSearchChange} className="text-slate-950 px-2 rounded-sm"/>
-                        { displayDropDown ?
-                            <div className="fixed bg-black text-white min-w-max w-60 max-h-96 overflow-auto rounded-md">
-                                {data.filter(item => {
-                                    const re = new RegExp(`${searchValue}`,'i')
-                                    return re.test(item.Name)
-                                }).map(item => <p className="hover:bg-slate-400 hover:text-slate-950 w-full px-2 cursor-pointer" onClick={() => onDropdownClick(item.Name)} key={item.id_name}>{item.Name}</p>)}
-                            </div>
-                            : undefined
-                        }
-                    </div>
-                </div> */}
                 <div className="flex flex-col gap-y-2">
                     <label>Initiative</label>
                     <input 
