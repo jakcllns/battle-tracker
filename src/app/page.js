@@ -5,6 +5,103 @@ import StatCard from "@/components/StatCard/StatCard";
 import Dice from "@/utils/DiceParser/DiceParser";
 import { useState, useEffect, useCallback } from "react";
 
+const fetchMonster = async id_name => {
+    const result = fetch('https://localhost:4000/graphql',{
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            query: `{
+                monster(id_name: "${id_name}") {
+                    _id
+                    id_name
+                    name
+                    size
+                    race
+                    alignment
+                    armorClass
+                    armorType
+                    hitPoints
+                    hitDie
+                    movementSpeed
+                    str
+                    dex
+                    con
+                    int
+                    wis
+                    cha
+                    savingThrows {
+                        savingThrowType
+                        modifier
+                    }
+                    skills {
+                        skillType
+                        modifier
+                    }
+                    damageResistances
+                    legendaryResistances
+                    damageImmunities
+                    conditionImmunities
+                    damageVulnerabilities
+                    senses
+                    languages
+                    challenge
+                    experience
+                    abilities {
+                        name
+                        description
+                        isAction
+                    }
+                    actions {
+                        name
+                        attackType
+                        modifier
+                        reach
+                        targets
+                        hits {
+                        dieType
+                        damageType
+                        }
+                        description
+                    }
+                    legendaryDescription
+                    legendaryActions {
+                        name
+                        description
+                    }
+                    lairDescription
+                    lairActions {
+                        name
+                        description
+                    }
+                    regionalDescription
+                    regionalEffects {
+                        name
+                        description
+                    }
+                        mythicDescription
+                    mythicActions {
+                        name
+                        description
+                    }
+                    }
+                }`
+            }),
+            cache: "no-cache"
+    }).then(res => res.json())
+    .then(res => {
+        if(res.errors){
+            console.log("error")
+            throw new Error(res.errors)
+        }
+
+        return res.data.monster
+    })
+    .catch(err => console.log(err))
+    return result
+}
+
 
 export default function Page(props){
     const [data, setData] = useState([])
@@ -12,14 +109,26 @@ export default function Page(props){
     const [creature, setCreature] = useState(undefined);
 
     useEffect(() => {
-        fetch(`api/new-monsters`, {cache: 'no-store'})
-            .then(res => {
-                return res.json()
-            })
-            .then(data => {
-                console.log(data)                
-                setData(data)
-            })
+        fetch('https://localhost:4000/graphql',{
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                query: `{
+                    monsters {
+                        id_name
+                        name
+                        hitPoints
+                        hitDie
+                        dex
+                        armorClass
+                      }
+                  }`
+              })
+        }).then(res => res.json())
+        .then(({data}) => setData(data.monsters))
+        .catch(err => console.log(err))
 
     },[])
 
@@ -27,7 +136,7 @@ export default function Page(props){
         const newCreatures = [...creatures]
         let hitPoints = 0
 
-        console.log(`Current creature: ${creature.name}`);
+        console.log(`Current creature: ${creature}`);
 
         if(creature.HitPoints > 0) {
             hitPoints = creature.hitPoints
@@ -90,13 +199,15 @@ export default function Page(props){
     },[creatures])
 
     const showStatBlock = id_name => {
-        console.log(id_name)
-        fetch(`api/new-monsters/${id_name}`, {method: 'GET'})
-        .then( res => res.json())
-        .then(m => {
-            console.log(m)
-            setCreature(m)
-        })
+        const m = fetchMonster(id_name).then(res => setCreature(res))
+        
+        // console.log(id_name)
+        // fetch(`api/new-monsters/${id_name}`, {method: 'GET'})
+        // .then( res => res.json())
+        // .then(m => {
+        //     console.log(m)
+        //     setCreature(m)
+        // })
     }
     return(
       <>
