@@ -55,7 +55,8 @@ export const CONDITIONS = [
     'prone',
     'restrained',
     'stunned',
-    'unconscious'
+    'unconscious',
+    'exhaustion'
 ]
 
 export const SAVING_THROWS = [
@@ -69,6 +70,7 @@ export const SAVING_THROWS = [
 
 export const LANGUAGES = [
     '-',
+    'All',
     'Common',
     'Dwarvish',
     'Elvish',

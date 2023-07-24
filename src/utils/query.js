@@ -1,9 +1,11 @@
 import { initializeMonster } from "./Monster/monster"
 
-const addMonster = (monster = initializeMonster()) => {
-    const query = `
+const MONSTER_API = 'https://localhost:4000/graphql'
+
+export const addMonster = async (monster = initializeMonster()) => {
+    const query = `mutation {
         addMonster(monster: {
-            id_name: "${monster.id_name}"
+            id_name: "${monster.name.toLocaleLowerCase().replace(/\s/g,'_')}"
             name: "${monster.name}"
             size: "${monster.size}"
             race: "${monster.race}"
@@ -28,7 +30,7 @@ const addMonster = (monster = initializeMonster()) => {
             damageResistances: [${monster.damageResistances.map(e => `"${e}"`).join(",")}]
             legendaryResistances: [${monster.legendaryResistances.map(e => `"${e}"`).join(",")}]
             damageImmunities: [${monster.damageImmunities.map(e => `"${e}"`).join(",")}]
-            conditionImmunties: [${monster.conditionImmunities.map(e => `"${e}"`).join(",")}]
+            conditionImmunities: [${monster.conditionImmunities.map(e => `"${e}"`).join(",")}]
             damageVulnerabilities: [${monster.damageVulnerabilites.map(e => `"${e}"`).join(",")}]
             senses: [${monster.senses.map(e => `"${e}"`).join(",")}]
             languages: [${monster.languages.map(e => `"${e}"`).join(",")}]
@@ -48,10 +50,48 @@ const addMonster = (monster = initializeMonster()) => {
                     description: "${e.description}"
                     }`
             }).join(",")}]
-            ${/* 
-            Working on adding in legendaryDescription, legendaryActions, lairDescription, lairActions, 
-            regionalDescription, regionalEffects, mythicDescription, mythicActions
-            */}
-        })
+            legendaryDescription: "${monster.legendaryDescription}"
+            legendaryActions: [${monster.legendaryActions.map(e => {
+                return `{name: "${e.name}", description: "${e.description}}`
+            }).join(",")}]
+            lairDescription: "${monster.lairDescription}"
+            lairActions: [${monster.lairActions.map(e => {
+                return `{name: "${e.name}", description: "${e.description}}`
+            }).join(",")}]
+            regionalDescription: "${monster.regionalDescription}"
+            regionalEffects: [${monster.regionalEffects.map(e => {
+                return `{name: "${e.name}", description: "${e.description}}`
+            }).join(",")}]
+            mythicDescription: "${monster.mythicDescription}"
+            mythicActions: [${monster.mythicActions.map(e => {
+                return `{name: "${e.name}", description: "${e.description}}`
+            }).join(",")}]
+        }) {
+            message
+            data {
+                _id
+                id_name
+                name
+            }
+        }}
     `
+    const result = fetch('https://localhost:4000/graphql', {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({query: query}),
+        cache: 'no-cache'
+    })
+    .then(res => res.json())
+    .then(res => {
+        if(res.errors){
+            console.log("error")
+            throw new Error(res.errors)
+        }
+        return res.data
+    })
+    .catch(err => console.error(JSON.stringify(err)))
+
+    return result
 }

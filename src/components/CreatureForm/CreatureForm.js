@@ -8,7 +8,8 @@ import SubmitButton from "@/components/SubmitButton/SubmitButton";
 import TextArea from "@/components/TextArea/TextArea";
 import { ChallengeRatings } from "@/utils/challengeRatingLookup";
 import { isDiceNotation, averageRoll } from "@/utils/DiceParser/DiceParser";
-import { ALIGNMENTS, CONDITIONS, createAbilities, createAction, createLegendaryAction, createSavingThrow, createSkill, CREATURE_TYPES, DAMAGE_TYPES, initializeMonster, LANGUAGES, SAVING_THROWS, SKILLS } from "@/utils/Monster/monster";
+import { ALIGNMENTS, CONDITIONS, createAbilities, createAction, createLegendaryAction, createSavingThrow, createSkill, CREATURE_TYPES, DAMAGE_TYPES, initializeMonster, LANGUAGES, SAVING_THROWS, SKILLS, DAMAGE_RESISTANCES } from "@/utils/Monster/monster";
+import { addMonster } from "@/utils/query";
 import { useEffect, useState } from "react";
 
 const refreshOptions = () => {
@@ -287,17 +288,20 @@ const CreaturForm = ({monster, setMonster, mode}) => {
     const handleCreateCreature = event => {
         event.preventDefault()
         // console.log(JSON.stringify({...monster, id_name: monster.name.toLowerCase().replace(/\s/g, '_')}))
-
-        fetch('api/new-monsters', {
-            method: 'POST',
-            body: JSON.stringify({...monster, id_name: monster.name.toLocaleLowerCase().replace(/\s/g,'_')})
+        addMonster(monster).then(res => {
+            console.log(res)
+            // setMonster(initializeMonster())
         })
-        .then( res => res.json())
-        .then( data => {
-            console.log(data)
-            setMonster(initializeMonster())
-            setOptions(refreshOptions())
-        })
+        // fetch('api/new-monsters', {
+        //     method: 'POST',
+        //     body: JSON.stringify({...monster, id_name: monster.name.toLocaleLowerCase().replace(/\s/g,'_')})
+        // })
+        // .then( res => res.json())
+        // .then( data => {
+        //     console.log(data)
+        //     setMonster(initializeMonster())
+        //     setOptions(refreshOptions())
+        // })
 
     }
 
@@ -315,7 +319,7 @@ const CreaturForm = ({monster, setMonster, mode}) => {
                     
                     
                     <ListInput
-                    items={DAMAGE_TYPES}
+                    items={DAMAGE_RESISTANCES}
                     handleAdd={handleAddResistance}
                     type={'text'}
                     />
@@ -345,7 +349,7 @@ const CreaturForm = ({monster, setMonster, mode}) => {
                 </div>
                 <div className="flex-row">
                     <ListInput
-                    items={DAMAGE_TYPES}
+                    items={DAMAGE_RESISTANCES}
                     handleAdd={handleAddDamageImmunity}
                     type={'text'}
                     />
