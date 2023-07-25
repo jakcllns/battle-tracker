@@ -3,104 +3,8 @@ import AddCreature from "@/components/AddCreature/AddCreature";
 import StatBlock from "@/components/StatBlock/StatBlock";
 import StatCard from "@/components/StatCard/StatCard";
 import Dice from "@/utils/DiceParser/DiceParser";
+import { fetchMonsters, fetchMonster } from "@/utils/query";
 import { useState, useEffect, useCallback } from "react";
-
-const fetchMonster = async id_name => {
-    const result = fetch('https://localhost:4000/graphql',{
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            query: `{
-                monster(id_name: "${id_name}") {
-                    _id
-                    id_name
-                    name
-                    size
-                    race
-                    alignment
-                    armorClass
-                    armorType
-                    hitPoints
-                    hitDie
-                    movementSpeed
-                    str
-                    dex
-                    con
-                    int
-                    wis
-                    cha
-                    savingThrows {
-                        savingThrowType
-                        modifier
-                    }
-                    skills {
-                        skillType
-                        modifier
-                    }
-                    damageResistances
-                    legendaryResistances
-                    damageImmunities
-                    conditionImmunities
-                    damageVulnerabilities
-                    senses
-                    languages
-                    challenge
-                    experience
-                    abilities {
-                        name
-                        description
-                        isAction
-                    }
-                    actions {
-                        name
-                        attackType
-                        modifier
-                        reach
-                        targets
-                        hits {
-                        dieType
-                        damageType
-                        }
-                        description
-                    }
-                    legendaryDescription
-                    legendaryActions {
-                        name
-                        description
-                    }
-                    lairDescription
-                    lairActions {
-                        name
-                        description
-                    }
-                    regionalDescription
-                    regionalEffects {
-                        name
-                        description
-                    }
-                        mythicDescription
-                    mythicActions {
-                        name
-                        description
-                    }
-                    }
-                }`
-            }),
-            cache: "no-cache"
-    }).then(res => res.json())
-    .then(res => {
-        if(res.errors){
-            console.log("error")
-            throw new Error(res.errors)
-        }
-
-        return res.data.monster
-    })
-    .catch(err => console.log(err))
-    return result
-}
 
 
 export default function Page(props){
@@ -109,27 +13,7 @@ export default function Page(props){
     const [creature, setCreature] = useState(undefined);
 
     useEffect(() => {
-        fetch('https://localhost:4000/graphql',{
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                query: `{
-                    monsters {
-                        id_name
-                        name
-                        hitPoints
-                        hitDie
-                        dex
-                        armorClass
-                      }
-                  }`
-              })
-        }).then(res => res.json())
-        .then(({data}) => setData(data.monsters))
-        .catch(err => console.log(err))
-
+        fetchMonsters(setData)
     },[])
 
     const handleCreatureSubmit = creature => {
